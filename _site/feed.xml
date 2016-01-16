@@ -5,9 +5,165 @@
     <description></description>
     <link>fdgdfgfdg/</link>
     <atom:link href="fdgdfgfdg/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sat, 16 Jan 2016 08:24:33 +0000</pubDate>
-    <lastBuildDate>Sat, 16 Jan 2016 08:24:33 +0000</lastBuildDate>
+    <pubDate>Sat, 16 Jan 2016 11:07:42 +0000</pubDate>
+    <lastBuildDate>Sat, 16 Jan 2016 11:07:42 +0000</lastBuildDate>
     <generator>Jekyll v3.0.1</generator>
+    
+      <item>
+        <title>jsoup学习笔记(一):一个简单的html处理工具</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;因最近在开发中需要对网页做特定处理，如px转为rem、类名的替换、class转为id、对某class进行排序等。
+虽然用java里String的一些方法如正则替换等也能做到，但是会非常繁琐，所以抽出时间学习一下html解析器:jsoup，
+然后写了一个小小的工具&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;jsoup&quot;&gt;什么是jsoup&lt;/h3&gt;
+&lt;p&gt;jsoup 是一款Java 的HTML解析器，可直接解析某个URL地址、HTML文本内容。它提供了一套非常省力的API，可通过DOM，CSS以及类似于jQuery的操作方法来取出和操作数据。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/jhy/jsoup&quot;&gt;jsoup的github地址&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;如何使用&lt;/h3&gt;
+&lt;p&gt;&lt;em&gt;使用jsoup要求你有一定的html、css知识&lt;/em&gt;&lt;/p&gt;
+
+&lt;h5 id=&quot;section-1&quot;&gt;1、从文件解析一个页面&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;Document doc=Jsoup.parse(new File(&quot;something&quot;),&quot;utf-8&quot;);//Document是一个装载html的文档类
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h5 id=&quot;section-2&quot;&gt;2、选择器&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;Elements elmt=doc.select(&quot;selector&quot;); //与css选择器语法一致
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h5 id=&quot;section-3&quot;&gt;3、常用方法&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;elmt.removeClass(&quot;className&quot;);   //删除指定的class
+elmt.attr(&quot;id&quot;,&quot;wtf&quot;);           //添加属性
+elmt.removeAttr(&quot;class&quot;);        //删除属性
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;有时候我们需要对整个dom树做一次遍历，这时候可以通过NodeVisitor来遍历&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public interface NodeVisitor {
+    //遍历到节点开始时，调用此方法
+    public void head(Node node, int depth);
+    //遍历到节点结束时(所有子节点都已遍历完)，调用此方法
+    public void tail(Node node, int depth);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;方法还有很多，大多数都能见名知意，就不一一列举了
+&lt;strong&gt;&lt;a href=&quot;http://jsoup.org/apidocs/&quot;&gt;jsoup的api&lt;/a&gt;&lt;/strong&gt;
+具体例子见下文我的小demo&lt;/p&gt;
+
+&lt;h3 id=&quot;demo&quot;&gt;一个简单的小demo&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;最近在调整html模版中遇到了这么几个需求&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h5 id=&quot;classidclassclass&quot;&gt;需求一：将指定的class属性替换为id属性,若替换后class属性为空，将class属性删除&lt;/h5&gt;
+&lt;p&gt;一个很简单的功能，但如果纯用java String来做的话会相对很繁琐&lt;/p&gt;
+
+&lt;p&gt;用jsoup就很方便了，先用选择器选出指定的class组，对其遍历，删除原class，再添加同名的id属性即可&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public void classConvertToId(String className,String idName){
+        Elements elmts=doc.select(className);
+        for(Element elmt:elmts){
+            elmt.removeClass(className.replaceAll(&quot;\\.|#&quot;,&quot;&quot;));
+            elmt.attr(&quot;id&quot;,idName.replaceAll(&quot;\\.|#&quot;,&quot;&quot;));
+            if(elmt.attr(&quot;class&quot;).isEmpty())
+                elmt.removeAttr(&quot;class&quot;);
+        }
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;是不是很简单呢，有点类似js的风格了&lt;/p&gt;
+
+&lt;h5 id=&quot;stylepxrem&quot;&gt;需求二：将页面内所有元素style属性内长度单位px转换为rem&lt;/h5&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;因美工给我们的页面是以px为单位，而为了适配页面在不同尺寸设备上的效果，需要使用rem单位，因此产生此需求&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;这里就要用到上文提到的NodeVisitor了&lt;/p&gt;
+
+&lt;p&gt;使用NodeVisitor和NodeTraversor进行遍历&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;NodeVisitor visitor=new NodeVisitor() {
+            @Override
+            public void head(Node node, int i) {
+                if (node.attr(&quot;style&quot;) != null &amp;amp;&amp;amp; !node.attr(&quot;style&quot;).isEmpty()) {
+                    StringBuffer sb = new StringBuffer(node.attr(&quot;style&quot;));
+			//doSomething here
+                }
+            }
+        };
+NodeTraversor tarversor=new NodeTraversor(visitor);
+tarversor.traverse(doc);
+		
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;顺便提一下，NodeTraversor的遍历是深度优先，核心代码如下&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+public void traverse(Node root) {
+    Node node = root;
+    int depth = 0;
+    while (node != null) {
+        visitor.head(node, depth);
+        if (node.childNodeSize() &amp;gt; 0) {
+            node = node.childNode(0);
+            depth++;
+        } else {
+            //退栈
+            while (node.nextSibling() == null &amp;amp;&amp;amp; depth &amp;gt; 0) {
+                visitor.tail(node, depth);
+                node = node.parent();
+                depth--;
+            }
+            //结束遍历
+            visitor.tail(node, depth);
+            if (node == root)
+                break;
+            node = node.nextSibling();
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;好了扯回来，在遍历的过程中拿到元素style属性的内容(如果有的话)，然后查找内容中是否存在需要转换的值&lt;/p&gt;
+
+&lt;p&gt;替换函数:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public void replaceByTarget(String startTarget,String endTarget,StringBuffer sb){
+                pxStartIndex=0;
+                pxEndIndex=0;
+                while(pxEndIndex!=-1){
+                    pxEndIndex=sb.indexOf(endTarget,pxEndIndex+1);
+                    pxStartIndex=sb.lastIndexOf(startTarget,pxEndIndex)+1;
+                    if(pxEndIndex!=-1){
+                        try{
+                            pxNum = Double.parseDouble(sb.substring(pxStartIndex, pxEndIndex).trim());
+                        }catch(NumberFormatException e){
+                            continue;
+                        }
+                        double remNum=pxNum/multiple;	//将px转换为rem，multiple为转换系数
+                        sb.replace(pxStartIndex, pxEndIndex+2, remNum+&quot;rem&quot;);
+                        pxStartIndex=0;
+                        pxEndIndex=0;
+                    }
+                }
+            }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;至此，这个需求功能基本就实现了&lt;/p&gt;
+
+&lt;p&gt;完整代码可以移步到我的github上:
+&lt;strong&gt;&lt;a href=&quot;https://github.com/PorUnaCabeza/CabezaUtil/blob/master/src/util/HtmlModelUtil.java&quot;&gt;cabezaUtil&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Thu, 14 Jan 2016 00:00:00 +0000</pubDate>
+        <link>fdgdfgfdg/blog/2016/01/14/jsoup-learning-note-1/</link>
+        <guid isPermaLink="true">fdgdfgfdg/blog/2016/01/14/jsoup-learning-note-1/</guid>
+        
+        <category>java</category>
+        
+        <category>jsoup</category>
+        
+        <category>html</category>
+        
+        
+        <category>blog</category>
+        
+      </item>
     
       <item>
         <title>just for test</title>
