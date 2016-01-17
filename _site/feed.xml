@@ -5,8 +5,8 @@
     <description></description>
     <link>fdgdfgfdg/</link>
     <atom:link href="fdgdfgfdg/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sat, 16 Jan 2016 11:07:42 +0000</pubDate>
-    <lastBuildDate>Sat, 16 Jan 2016 11:07:42 +0000</lastBuildDate>
+    <pubDate>Sun, 17 Jan 2016 06:25:57 +0000</pubDate>
+    <lastBuildDate>Sun, 17 Jan 2016 06:25:57 +0000</lastBuildDate>
     <generator>Jekyll v3.0.1</generator>
     
       <item>
@@ -159,21 +159,6 @@ public void traverse(Node root) {
         <category>jsoup</category>
         
         <category>html</category>
-        
-        
-        <category>blog</category>
-        
-      </item>
-    
-      <item>
-        <title>just for test</title>
-        <description>&lt;h2 id=&quot;section&quot;&gt;测试&lt;/h2&gt;
-</description>
-        <pubDate>Mon, 04 Jan 2016 00:00:00 +0000</pubDate>
-        <link>fdgdfgfdg/blog/2016/01/04/test/</link>
-        <guid isPermaLink="true">fdgdfgfdg/blog/2016/01/04/test/</guid>
-        
-        <category>生活</category>
         
         
         <category>blog</category>
