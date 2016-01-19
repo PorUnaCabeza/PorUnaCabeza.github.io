@@ -5,8 +5,8 @@
     <description></description>
     <link>fdgdfgfdg/</link>
     <atom:link href="fdgdfgfdg/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Tue, 19 Jan 2016 14:28:13 +0000</pubDate>
-    <lastBuildDate>Tue, 19 Jan 2016 14:28:13 +0000</lastBuildDate>
+    <pubDate>Tue, 19 Jan 2016 15:20:53 +0000</pubDate>
+    <lastBuildDate>Tue, 19 Jan 2016 15:20:53 +0000</lastBuildDate>
     <generator>Jekyll v3.0.1</generator>
     
       <item>
@@ -30,6 +30,51 @@ con.header(&quot;User-Agent&quot;, &quot;Mozilla/5.0 (Windows NT 6.1; WOW64; rv:
 con.timeout(3000);
 Connection.Response rs = con.execute();//拿到返回的response信息
 Document doc = Jsoup.parse(rs.body());//得到目标url的dom结构&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;execute方法会抛出IOException，注意用try-catch语句包住或throws掉&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h4 id=&quot;dom&quot;&gt;分析网页dom结构，编写对应的解析方法&lt;/h4&gt;
+
+&lt;p&gt;首先观察dom结构
+&lt;img src=&quot;http://7xq9w1.com1.z0.glb.clouddn.com/2016-01-16-jsoup-learning-note-2-1.jpg&quot; alt=&quot;知乎个人动态的dom结构&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;发现个人动态都是包裹在 &lt;em&gt;class=”zm-profile-section-item zm-item clearfix”&lt;/em&gt; 的div内的&lt;/p&gt;
+
+&lt;p&gt;而 &lt;em&gt;data-time&lt;/em&gt; 属性内的值稍有编程经验的人都可看出是unix时间戳，分析其是该条动态的时间信息&lt;/p&gt;
+
+&lt;p&gt;据此可以拿到当前页的个人动态的dom集合&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Elements elmts = doc.select(&quot;.zm-profile-section-item.zm-item.clearfix&quot;);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;进行遍历后遍可输出本次请求获取的所有个人动态&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;//使用SimpleDateFormat格式化unix时间戳
+SimpleDateFormat sdf = new SimpleDateFormat(&quot;yyyy/MM/dd HH:mm:ss&quot;);
+for (Element elmt : elmts) {
+	System.out.println(sdf.format(new java.util.Date(Long.parseLong(elmt.attr(&quot;data-time&quot;)) * 1000)));
+	System.out.println(elmt.select(&quot;.zm-profile-activity-page-item-main&quot;).text() + &quot;www.zhihu.com&quot; + elmt.select(&quot;.question_link&quot;).attr(&quot;href&quot;));
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;上面代码块内，个人动态的url是使用 &lt;em&gt;baseUrl+quetion_link&lt;/em&gt; 形式拼起来的，也可以使用:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;elmt.select(&quot;.question_link&quot;).attr(&quot;abs:href&quot;);&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;有的时候直接使用 &lt;em&gt;abs:href&lt;/em&gt; 读取不到正确的绝对地址，这时候需要在document处指定baseUrl:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;doc.setBaseUri(&quot;https://www.zhihu.com&quot;);
+...
+elmt.select(&quot;.question_link&quot;).attr(&quot;abs:href&quot;);//这时候读取到的就是正确的url了
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;现在就可以读取某人首页地址并输出他的动态信息了&lt;/p&gt;
+
+&lt;p&gt;但是会发现一个问题，未登录用户（显然上文用jsoup访问url属于未登录）在访问某人首页时会存在延迟（即他的最新动态不能及时获取），延迟时间大概是10~20分钟&lt;/p&gt;
+
+&lt;p&gt;而已登录用户（如在浏览器内登录）刷新某人首页则是实时显示他的动态&lt;/p&gt;
+
+&lt;p&gt;推测是知乎为了防止爬虫频繁刷取页面&lt;/p&gt;
+
+&lt;p&gt;下一步就是用jsoup模拟登录了！&lt;/p&gt;
+
 </description>
         <pubDate>Tue, 19 Jan 2016 00:00:00 +0000</pubDate>
         <link>fdgdfgfdg/blog/2016/01/19/jsoup-learning-note-2/</link>

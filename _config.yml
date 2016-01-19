@@ -9,7 +9,7 @@ url: "fdgdfgfdg"
 
 # About/contact
 owner: 
-  name: " 张黑子"
+  name: " cabeza"
   email: makpia@163.com
   bio: "asdfghj"
 gems: [jekyll-paginate]
@@ -47,7 +47,7 @@ defaults:
       type: "posts"
     values:
       layout: "post"
-      author: "张黑子"
+      author: "cabeza"
       header-color: "#555"
 
 # Comments 

@@ -222,7 +222,7 @@ hr.small {
   .intro-header .site-heading,
   .intro-header .post-heading,
   .intro-header .page-heading {
-    padding: 150px 0;
+    padding: 110px 0;
   }
 }
 .intro-header .site-heading,
@@ -522,26 +522,5 @@ body {
 }
 .navbar-default .navbar-toggle:active {
   background-color: #ddd;
-}
-
-
-.Tags a, .Tags .tag {
-    display: inline-block;
-    border: 1px solid rgba(255,255,255,.8);
-    border-radius: 999em;
-    padding: 0 10px;
-    color: #fff;
-    line-height: 24px;
-    font-size: 12px;
-    text-decoration: none;
-    margin: 0 1px;
-    margin-bottom: 6px;
-	margin-right:5px;
-}
-.Tags a:hover, .Tags .tag:hover, .Tags a:active, .Tags .tag:active {
-    color: #fff;
-    border-color: #fff;
-    background-color: rgba(255,255,255,.4);
-    text-decoration: none;
 }
 
