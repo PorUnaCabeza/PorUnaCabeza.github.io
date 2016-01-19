@@ -1,13 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>搬砖笔记</title>
+    <title>Namárië</title>
     <description></description>
     <link>fdgdfgfdg/</link>
     <atom:link href="fdgdfgfdg/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sun, 17 Jan 2016 06:25:57 +0000</pubDate>
-    <lastBuildDate>Sun, 17 Jan 2016 06:25:57 +0000</lastBuildDate>
+    <pubDate>Tue, 19 Jan 2016 14:28:13 +0000</pubDate>
+    <lastBuildDate>Tue, 19 Jan 2016 14:28:13 +0000</lastBuildDate>
     <generator>Jekyll v3.0.1</generator>
+    
+      <item>
+        <title>jsoup学习笔记(二):读取知乎个人首页动态</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;在使用一段时间jsoup后，不满足仅仅处理一些本地文件，因知乎上不提供特别关注某位答主的功能，所以准备慢慢写一个监控动态的工具&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h4 id=&quot;jsoupurl&quot;&gt;jsoup从url加载网页&lt;/h4&gt;
+
+&lt;p&gt;使用jsoup的connect方法，但注意&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;要在消息头内添加user-agent信息，用来模拟浏览器&lt;/li&gt;
+  &lt;li&gt;合理设置timeout数值，防止异常&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;如:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Connection con = Jsoup.connect(&quot;https://www.zhihu.com/people/rednaxelafx&quot;);//获取连接
+con.header(&quot;User-Agent&quot;, &quot;Mozilla/5.0 (Windows NT 6.1; WOW64; rv:29.0) Gecko/20100101 Firefox/29.0&quot;);//配置模拟浏览器
+con.timeout(3000);
+Connection.Response rs = con.execute();//拿到返回的response信息
+Document doc = Jsoup.parse(rs.body());//得到目标url的dom结构&lt;/code&gt;&lt;/pre&gt;
+</description>
+        <pubDate>Tue, 19 Jan 2016 00:00:00 +0000</pubDate>
+        <link>fdgdfgfdg/blog/2016/01/19/jsoup-learning-note-2/</link>
+        <guid isPermaLink="true">fdgdfgfdg/blog/2016/01/19/jsoup-learning-note-2/</guid>
+        
+        <category>java</category>
+        
+        <category>jsoup</category>
+        
+        <category>html</category>
+        
+        
+        <category>blog</category>
+        
+      </item>
     
       <item>
         <title>jsoup学习笔记(一):一个简单的html处理工具</title>
