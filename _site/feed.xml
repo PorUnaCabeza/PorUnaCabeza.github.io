@@ -5,9 +5,254 @@
     <description></description>
     <link>fdgdfgfdg/</link>
     <atom:link href="fdgdfgfdg/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 22 Jan 2016 10:40:24 +0000</pubDate>
-    <lastBuildDate>Fri, 22 Jan 2016 10:40:24 +0000</lastBuildDate>
+    <pubDate>Sat, 23 Jan 2016 12:42:56 +0000</pubDate>
+    <lastBuildDate>Sat, 23 Jan 2016 12:42:56 +0000</lastBuildDate>
     <generator>Jekyll v3.0.1</generator>
+    
+      <item>
+        <title>jsoup学习笔记(三):模拟登录</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;如上文所述，未登录状态爬取信息时会有很多限制，那么就来看看如何模拟登录知乎&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;cookie&quot;&gt;采用最暴力的方法：硬塞cookie&lt;/h3&gt;
+
+&lt;p&gt;首先，在浏览器上登录帐号，然后提取到cookie&lt;/p&gt;
+
+&lt;p&gt;关于如何获取，各个浏览器不一样，可以针对自己的百度下&lt;/p&gt;
+
+&lt;p&gt;拿到cookie值后，在程序里硬编码写入&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Connection con = Jsoup.connect(&quot;https://www.zhihu.com&quot;);//获取连接
+con.header(&quot;User-Agent&quot;, &quot;Mozilla/5.0 (Windows NT 6.1; WOW64; rv:29.0) Gecko/20100101 Firefox/29.0&quot;);//配置模拟浏览器
+Map&amp;lt;String, String&amp;gt; cookie = new HashMap&amp;lt;&amp;gt;();
+cookie.put(&quot;_xsrf&quot;, &quot;af8cfcba675ae98ae5a6e238b2844238&quot;);
+cookie.put(&quot;_za&quot;, &quot;7699d7fa-905b-44bf-9a08-583ca27692b3&quot;);
+cookie.put(&quot;__utma&quot;, &quot;51854390.1095779136.1452616328.1452616328.1452616328.1&quot;);
+cookie.put(&quot;__utmb&quot;, &quot;51854390.14.10.1452616328&quot;);
+cookie.put(&quot;__utmc&quot;, &quot;51854390&quot;);
+//...许多cookie，省略
+con.cookies(cookie);
+Connection.Response rs = con.execute();
+Document doc = Jsoup.parse(rs.body());
+System.out.println(doc);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;结果如之前所料，是已登录的状态&lt;/p&gt;
+
+&lt;p&gt;此方法只是权宜之计，比如临时写一个只会用几次的爬虫程序&lt;/p&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;模拟登录知乎&lt;/h3&gt;
+
+&lt;p&gt;下面一步步分析&lt;/p&gt;
+
+&lt;h4 id=&quot;section-1&quot;&gt;1.请求地址&lt;/h4&gt;
+&lt;p&gt;使用chrome开发者工具中的network功能抓取：&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Request URL:https://www.zhihu.com/login/email&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h4 id=&quot;section-2&quot;&gt;2.需要哪些字段&lt;/h4&gt;
+
+&lt;p&gt;打开知乎首页，观察登录表单&lt;/p&gt;
+
+&lt;p&gt;帐号密码输入框、验证码输入框&lt;/p&gt;
+
+&lt;p&gt;随便填几个值，点登录，使用chrome开发者工具中的network功能抓取请求头form data：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;_xsrf:88d1ff7fd5a1f66f306b8f720a7322b8
+password:123456
+captcha:1234
+remember_me:true
+email:12345678
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;发现五个字段&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;_xsrf，暂时不知道作用，猜测是一种验证机制&lt;/li&gt;
+  &lt;li&gt;email、password，见名知意，帐号密码&lt;/li&gt;
+  &lt;li&gt;remember，是否记住帐号&lt;/li&gt;
+  &lt;li&gt;captcha，验证码值&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;只有_xsrf不知其意，查看网页源代码，发现&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;input type=&quot;hidden&quot; name=&quot;_xsrf&quot; value=&quot;88d1ff7fd5a1f66f306b8f720a7322b8&quot;&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ok，管你是什么意思，我先发一次请求拿到你，第二次的时候直接塞进去不就得了
+如码所示：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public void getXsrf() {
+		con = Jsoup.connect(&quot;http://www.zhihu.com&quot;);
+		con.header(&quot;User-Agent&quot;, userAgent);
+		try {
+			rs = con.execute();
+		} catch (Exception e) {
+			log.info(&quot;获得Xsrf失败&quot;);
+			return;
+		}
+		Document doc=Jsoup.parse(rs.body());
+		_xsrf=doc.select(&quot;.view.view-signin [name=\&quot;_xsrf\&quot;]&quot;).attr(&quot;value&quot;);
+		log.info(&quot;已获得xsrf&quot;);
+	}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&quot;section-3&quot;&gt;3.如何获取验证码&lt;/h4&gt;
+
+&lt;p&gt;查看网页源代码&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;img class=&quot;js-refresh-captcha captcha&quot; width=&quot;120&quot; height=&quot;30&quot; data-tip=&quot;s$t$看不清楚？换一张&quot; alt=&quot;验证码&quot; src=&quot;/captcha.gif?r=1453549553883&quot;&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;得到验证码地址：&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;www.zhihu.com/captcha.gif?r=一些数字&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;很容易可以看出，r的值为Unix时间戳&lt;/p&gt;
+
+&lt;p&gt;下一步，代码实现下载验证码到本地，并保存该验证码的cookie，为后面登录做准备&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;private Map&amp;lt;String,String&amp;gt; captchaCookies =new HashMap&amp;lt;&amp;gt;();
+....
+public void getCaptcha() {
+		captchaCookies.clear();
+		log.info(System.currentTimeMillis());
+		con = Jsoup.connect(&quot;https://www.zhihu.com/captcha.gif?r=&quot; + System.currentTimeMillis()).ignoreContentType(true);//获取连接
+		con.header(&quot;User-Agent&quot;, userAgent);
+		try {
+			rs = con.execute();
+		} catch (Exception e) {
+			log.info(&quot;获得验证码cookie失败&quot;);
+			return;
+		}
+		File file = new File(&quot;cabeza.gif&quot;);
+		try {
+			FileOutputStream out = (new FileOutputStream(file));
+			out.write(rs.bodyAsBytes());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		captchaCookies.putAll(rs.cookies());
+		log.info(&quot;验证码已保存&quot; + &quot;,路径为:&quot; + file.getAbsolutePath());
+	}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;验证码和对应cookie拿到后，下面就是登录了&lt;/p&gt;
+
+&lt;h4 id=&quot;section-4&quot;&gt;4.根据上述五个字段，实现登录&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;public void getLoginCookies() {
+    loginCookies.clear();
+    Scanner sc=new Scanner(System.in);
+    getXsrf();	//获取_xsrf
+    getCaptchaCookies();	//获取验证码和验证码cookie
+    log.info(&quot;请输入帐号&quot;);
+    String userName=sc.nextLine();
+    log.info(&quot;请输入密码&quot;);
+    String passWord=sc.nextLine();
+    log.info(&quot;请打开工程路径查看验证码并输入&quot;);
+    String captcha=sc.nextLine();
+    con = Jsoup.connect(&quot;https://www.zhihu.com/login/email&quot;);
+    con.header(&quot;User-Agent&quot;, userAgent);
+    try {
+        rs = con.ignoreContentType(true).method(Connection.Method.POST)
+                .data(&quot;_xsrf&quot;, _xsrf)
+                .data(&quot;email&quot;, userName)
+                .data(&quot;password&quot;, passWord)
+                .data(&quot;captcha&quot;, captcha).cookies(captchaCookies).execute();
+    } catch (Exception e) {
+        log.info(&quot;获得loginCookies失败&quot;);
+        return;
+    }
+    loginCookies.putAll(rs.cookies());
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&quot;section-5&quot;&gt;5.一些后续工作&lt;/h4&gt;
+&lt;p&gt;拿到登录cookie后，为了方便下次登录，可以将cookie保存到文件，下次先从文件读取cookie登录，若失败，再使用上文方法登录&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public void saveCookies(String fileName, Map&amp;lt;String, String&amp;gt; cookies) {
+    FileOutputStream fos = null;
+    try {
+        fos = new FileOutputStream(fileName);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    BufferedOutputStream bos
+            = new BufferedOutputStream(fos);
+    PrintWriter pw = new PrintWriter(bos);
+    for (Map.Entry&amp;lt;String, String&amp;gt; entry : cookies.entrySet()) {
+        pw.println(entry.getKey() + &quot;=&quot; + entry.getValue().replace(&quot;\&quot;&quot;,&quot;&quot;));
+    }
+    pw.close();
+    log.info(&quot;cookies已保存&quot;);
+}
+public void readCookies(String filename) {
+    loginCookies.clear();
+    try {
+        FileInputStream fis
+                = new FileInputStream(filename);
+        InputStreamReader isr
+                = new InputStreamReader(fis);
+        BufferedReader br
+                = new BufferedReader(isr);
+        String str = null;
+        while ((str = br.readLine()) != null) {
+            int index = str.indexOf(&quot;=&quot;);
+            loginCookies.put(
+                    str.substring(0, index),
+                    str.substring(index + 1, str.length())
+            );
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    log.info(loginCookies);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;从文件读取cookie登录&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public boolean loginBySavedCookies() {
+    readCookies(&quot;zhihu_cookies.txt&quot;);
+    con = Jsoup.connect(&quot;https://www.zhihu.com&quot;);//获取连接
+    con.header(&quot;User-Agent&quot;, userAgent);//配置模拟浏览器
+    con.cookies(loginCookies);
+    try {
+        rs = con.execute();
+    } catch (Exception e) {
+        log.info(&quot;读取Cookie登录失败&quot;);
+        return false;
+    }
+    Document doc = Jsoup.parse(rs.body());
+    if (checkLogin(doc))
+        return true;
+    log.info(&quot;读取cookie登录失败,下面手动登录:&quot;);
+    return login();
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;至此，一个简单的模拟登录程序就完成了&lt;/p&gt;
+</description>
+        <pubDate>Sat, 23 Jan 2016 00:00:00 +0000</pubDate>
+        <link>fdgdfgfdg/blog/2016/01/23/jsoup-learning-note-3/</link>
+        <guid isPermaLink="true">fdgdfgfdg/blog/2016/01/23/jsoup-learning-note-3/</guid>
+        
+        <category>java</category>
+        
+        <category>jsoup</category>
+        
+        <category>html</category>
+        
+        
+        <category>blog</category>
+        
+      </item>
     
       <item>
         <title>jsoup学习笔记(二):读取知乎个人首页动态</title>

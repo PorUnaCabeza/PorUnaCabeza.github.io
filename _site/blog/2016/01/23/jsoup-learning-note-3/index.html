@@ -8,9 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
 
-    <title>jsoup学习笔记(二):读取知乎个人首页动态 - Namárië</title>
+    <title>jsoup学习笔记(三):模拟登录 - Namárië</title>
 
-    <link rel="canonical" href="fdgdfgfdg/blog/2016/01/19/jsoup-learning-note-2/">
+    <link rel="canonical" href="fdgdfgfdg/blog/2016/01/23/jsoup-learning-note-3/">
 
     <!-- Icons -->
   <link rel="shortcut icon" href="/img/favicon.ico">
@@ -106,9 +106,9 @@
                         <a class="tag" style="" href="/tags/#html" title="html">html</a>
                         
                     </div>
-                    <h1>jsoup学习笔记(二):读取知乎个人首页动态</h1>
+                    <h1>jsoup学习笔记(三):模拟登录</h1>
                     
-                    <span class="meta">Posted by cabeza on January 19, 2016</span>
+                    <span class="meta">Posted by cabeza on January 23, 2016</span>
                 </div>
             </div>
         </div>
@@ -125,69 +125,232 @@
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 post-container">
 
                 <blockquote>
-  <p>在使用一段时间jsoup后，不满足仅仅处理一些本地文件，因知乎上不提供特别关注某位答主的功能，所以准备慢慢写一个监控动态的工具</p>
+  <p>如上文所述，未登录状态爬取信息时会有很多限制，那么就来看看如何模拟登录知乎</p>
 </blockquote>
 
-<h4 id="jsoupurl">jsoup从url加载网页</h4>
+<h3 id="cookie">采用最暴力的方法：硬塞cookie</h3>
 
-<p>使用jsoup的connect方法，但注意</p>
+<p>首先，在浏览器上登录帐号，然后提取到cookie</p>
 
-<ul>
-  <li>要在消息头内添加user-agent信息，用来模拟浏览器</li>
-  <li>合理设置timeout数值，防止异常</li>
-</ul>
+<p>关于如何获取，各个浏览器不一样，可以针对自己的百度下</p>
 
-<p>如:</p>
-<pre><code>Connection con = Jsoup.connect("https://www.zhihu.com/people/rednaxelafx");//获取连接
+<p>拿到cookie值后，在程序里硬编码写入</p>
+
+<pre><code>Connection con = Jsoup.connect("https://www.zhihu.com");//获取连接
 con.header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:29.0) Gecko/20100101 Firefox/29.0");//配置模拟浏览器
-con.timeout(3000);
-Connection.Response rs = con.execute();//拿到返回的response信息
-Document doc = Jsoup.parse(rs.body());//得到目标url的dom结构</code></pre>
+Map&lt;String, String&gt; cookie = new HashMap&lt;&gt;();
+cookie.put("_xsrf", "af8cfcba675ae98ae5a6e238b2844238");
+cookie.put("_za", "7699d7fa-905b-44bf-9a08-583ca27692b3");
+cookie.put("__utma", "51854390.1095779136.1452616328.1452616328.1452616328.1");
+cookie.put("__utmb", "51854390.14.10.1452616328");
+cookie.put("__utmc", "51854390");
+//...许多cookie，省略
+con.cookies(cookie);
+Connection.Response rs = con.execute();
+Document doc = Jsoup.parse(rs.body());
+System.out.println(doc);
+</code></pre>
+
+<p>结果如之前所料，是已登录的状态</p>
+
+<p>此方法只是权宜之计，比如临时写一个只会用几次的爬虫程序</p>
+
+<h3 id="section">模拟登录知乎</h3>
+
+<p>下面一步步分析</p>
+
+<h4 id="section-1">1.请求地址</h4>
+<p>使用chrome开发者工具中的network功能抓取：</p>
 
 <blockquote>
-  <p>execute方法会抛出IOException，注意用try-catch语句包住或throws掉</p>
+  <p>Request URL:https://www.zhihu.com/login/email</p>
 </blockquote>
 
-<h4 id="dom">分析网页dom结构，编写对应的解析方法</h4>
+<h4 id="section-2">2.需要哪些字段</h4>
 
-<p>首先观察dom结构
-<img src="http://7xq9w1.com1.z0.glb.clouddn.com/2016-01-16-jsoup-learning-note-2-1.jpg" alt="知乎个人动态的dom结构" /></p>
+<p>打开知乎首页，观察登录表单</p>
 
-<p>发现个人动态都是包裹在 <em>class=”zm-profile-section-item zm-item clearfix”</em> 的div内的</p>
+<p>帐号密码输入框、验证码输入框</p>
 
-<p>而 <em>data-time</em> 属性内的值稍有编程经验的人都可看出是unix时间戳，分析其是该条动态的时间信息</p>
+<p>随便填几个值，点登录，使用chrome开发者工具中的network功能抓取请求头form data：</p>
 
-<p>据此可以拿到当前页的个人动态的dom集合</p>
-<pre><code>Elements elmts = doc.select(".zm-profile-section-item.zm-item.clearfix");
+<pre><code>_xsrf:88d1ff7fd5a1f66f306b8f720a7322b8
+password:123456
+captcha:1234
+remember_me:true
+email:12345678
 </code></pre>
 
-<p>进行遍历后遍可输出本次请求获取的所有个人动态</p>
-<pre><code>//使用SimpleDateFormat格式化unix时间戳
-SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-for (Element elmt : elmts) {
-	System.out.println(sdf.format(new java.util.Date(Long.parseLong(elmt.attr("data-time")) * 1000)));
-	System.out.println(elmt.select(".zm-profile-activity-page-item-main").text() + "www.zhihu.com" + elmt.select(".question_link").attr("href"));
-}</code></pre>
+<p>发现五个字段</p>
 
-<p>上面代码块内，个人动态的url是使用 <em>baseUrl+quetion_link</em> 形式拼起来的，也可以使用:</p>
-<pre><code>elmt.select(".question_link").attr("abs:href");</code></pre>
+<ul>
+  <li>_xsrf，暂时不知道作用，猜测是一种验证机制</li>
+  <li>email、password，见名知意，帐号密码</li>
+  <li>remember，是否记住帐号</li>
+  <li>captcha，验证码值</li>
+</ul>
 
-<p>有的时候直接使用 <em>abs:href</em> 读取不到正确的绝对地址，这时候需要在document处指定baseUrl:</p>
-<pre><code>doc.setBaseUri("https://www.zhihu.com");
-...
-elmt.select(".question_link").attr("abs:href");//这时候读取到的就是正确的url了
+<p>只有_xsrf不知其意，查看网页源代码，发现</p>
+
+<pre><code>&lt;input type="hidden" name="_xsrf" value="88d1ff7fd5a1f66f306b8f720a7322b8"&gt;
 </code></pre>
 
-<p>现在就可以读取某人首页地址并输出他的动态信息了</p>
+<p>ok，管你是什么意思，我先发一次请求拿到你，第二次的时候直接塞进去不就得了
+如码所示：</p>
 
-<p>但是会发现一个问题，未登录用户（显然上文用jsoup访问url属于未登录）在访问某人首页时会存在延迟（即他的最新动态不能及时获取），延迟时间大概是10~20分钟</p>
+<pre><code>public void getXsrf() {
+		con = Jsoup.connect("http://www.zhihu.com");
+		con.header("User-Agent", userAgent);
+		try {
+			rs = con.execute();
+		} catch (Exception e) {
+			log.info("获得Xsrf失败");
+			return;
+		}
+		Document doc=Jsoup.parse(rs.body());
+		_xsrf=doc.select(".view.view-signin [name=\"_xsrf\"]").attr("value");
+		log.info("已获得xsrf");
+	}
+</code></pre>
 
-<p>而已登录用户（如在浏览器内登录）刷新某人首页则是实时显示他的动态</p>
+<h4 id="section-3">3.如何获取验证码</h4>
 
-<p>推测是知乎为了防止爬虫频繁刷取页面</p>
+<p>查看网页源代码</p>
 
-<p>下一步就是用jsoup模拟登录了！</p>
+<pre><code>&lt;img class="js-refresh-captcha captcha" width="120" height="30" data-tip="s$t$看不清楚？换一张" alt="验证码" src="/captcha.gif?r=1453549553883"&gt;
+</code></pre>
 
+<p>得到验证码地址：</p>
+
+<blockquote>
+  <p>www.zhihu.com/captcha.gif?r=一些数字</p>
+</blockquote>
+
+<p>很容易可以看出，r的值为Unix时间戳</p>
+
+<p>下一步，代码实现下载验证码到本地，并保存该验证码的cookie，为后面登录做准备</p>
+
+<pre><code>private Map&lt;String,String&gt; captchaCookies =new HashMap&lt;&gt;();
+....
+public void getCaptcha() {
+		captchaCookies.clear();
+		log.info(System.currentTimeMillis());
+		con = Jsoup.connect("https://www.zhihu.com/captcha.gif?r=" + System.currentTimeMillis()).ignoreContentType(true);//获取连接
+		con.header("User-Agent", userAgent);
+		try {
+			rs = con.execute();
+		} catch (Exception e) {
+			log.info("获得验证码cookie失败");
+			return;
+		}
+		File file = new File("cabeza.gif");
+		try {
+			FileOutputStream out = (new FileOutputStream(file));
+			out.write(rs.bodyAsBytes());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		captchaCookies.putAll(rs.cookies());
+		log.info("验证码已保存" + ",路径为:" + file.getAbsolutePath());
+	}
+</code></pre>
+
+<p>验证码和对应cookie拿到后，下面就是登录了</p>
+
+<h4 id="section-4">4.根据上述五个字段，实现登录</h4>
+
+<pre><code>public void getLoginCookies() {
+    loginCookies.clear();
+    Scanner sc=new Scanner(System.in);
+    getXsrf();	//获取_xsrf
+    getCaptchaCookies();	//获取验证码和验证码cookie
+    log.info("请输入帐号");
+    String userName=sc.nextLine();
+    log.info("请输入密码");
+    String passWord=sc.nextLine();
+    log.info("请打开工程路径查看验证码并输入");
+    String captcha=sc.nextLine();
+    con = Jsoup.connect("https://www.zhihu.com/login/email");
+    con.header("User-Agent", userAgent);
+    try {
+        rs = con.ignoreContentType(true).method(Connection.Method.POST)
+                .data("_xsrf", _xsrf)
+                .data("email", userName)
+                .data("password", passWord)
+                .data("captcha", captcha).cookies(captchaCookies).execute();
+    } catch (Exception e) {
+        log.info("获得loginCookies失败");
+        return;
+    }
+    loginCookies.putAll(rs.cookies());
+}
+</code></pre>
+
+<h4 id="section-5">5.一些后续工作</h4>
+<p>拿到登录cookie后，为了方便下次登录，可以将cookie保存到文件，下次先从文件读取cookie登录，若失败，再使用上文方法登录</p>
+
+<pre><code>public void saveCookies(String fileName, Map&lt;String, String&gt; cookies) {
+    FileOutputStream fos = null;
+    try {
+        fos = new FileOutputStream(fileName);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    BufferedOutputStream bos
+            = new BufferedOutputStream(fos);
+    PrintWriter pw = new PrintWriter(bos);
+    for (Map.Entry&lt;String, String&gt; entry : cookies.entrySet()) {
+        pw.println(entry.getKey() + "=" + entry.getValue().replace("\"",""));
+    }
+    pw.close();
+    log.info("cookies已保存");
+}
+public void readCookies(String filename) {
+    loginCookies.clear();
+    try {
+        FileInputStream fis
+                = new FileInputStream(filename);
+        InputStreamReader isr
+                = new InputStreamReader(fis);
+        BufferedReader br
+                = new BufferedReader(isr);
+        String str = null;
+        while ((str = br.readLine()) != null) {
+            int index = str.indexOf("=");
+            loginCookies.put(
+                    str.substring(0, index),
+                    str.substring(index + 1, str.length())
+            );
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    log.info(loginCookies);
+}
+</code></pre>
+
+<p>从文件读取cookie登录</p>
+
+<pre><code>public boolean loginBySavedCookies() {
+    readCookies("zhihu_cookies.txt");
+    con = Jsoup.connect("https://www.zhihu.com");//获取连接
+    con.header("User-Agent", userAgent);//配置模拟浏览器
+    con.cookies(loginCookies);
+    try {
+        rs = con.execute();
+    } catch (Exception e) {
+        log.info("读取Cookie登录失败");
+        return false;
+    }
+    Document doc = Jsoup.parse(rs.body());
+    if (checkLogin(doc))
+        return true;
+    log.info("读取cookie登录失败,下面手动登录:");
+    return login();
+}
+</code></pre>
+
+<p>至此，一个简单的模拟登录程序就完成了</p>
 
 
                 <hr>
@@ -195,13 +358,9 @@ elmt.select(".question_link").attr("abs:href");//这时候读取到的就是正�
                 <ul class="pager">
                     
                     <li class="previous">
-                        <a href="/blog/2016/01/14/jsoup-learning-note-1/" data-toggle="tooltip" data-placement="top" title="jsoup学习笔记(一):一个简单的html处理工具">&larr; Previous Post</a>
+                        <a href="/blog/2016/01/19/jsoup-learning-note-2/" data-toggle="tooltip" data-placement="top" title="jsoup学习笔记(二):读取知乎个人首页动态">&larr; Previous Post</a>
                     </li>
                     
-                    
-                    <li class="next">
-                        <a href="/blog/2016/01/23/jsoup-learning-note-3/" data-toggle="tooltip" data-placement="top" title="jsoup学习笔记(三):模拟登录">Next Post &rarr;</a>
-                    </li>
                     
                 </ul>
 
@@ -219,14 +378,16 @@ elmt.select(".question_link").attr("abs:href");//这时候读取到的就是正�
                 </style>
 
                 <div class="ds-share"
-                    data-thread-key="/blog/2016/01/19/jsoup-learning-note-2" data-title="jsoup学习笔记(二):读取知乎个人首页动态"
+                    data-thread-key="/blog/2016/01/23/jsoup-learning-note-3" data-title="jsoup学习笔记(三):模拟登录"
                     data-images="fdgdfgfdg/img/facebook.jpg"
                     data-content="
-  在使用一段时间jsoup后，不满足仅仅处理一些本地文件，因知乎上不提供特别关注某位答主的功能，所以准备慢慢写一个监控动态的工具
+  如上文所述，未登录状态爬取信息时会有很多限制，那么就来看看如何模拟登录知乎
 
 
-jsoup从ur... | Microdust:Azeril's blog"
-                    data-url="fdgdfgfdg/blog/2016/01/19/jsoup-learning-note-2/">
+采用最暴力的方法：硬塞cookie
+
+首先，在浏览器上登录帐号，然后... | Microdust:Azeril's blog"
+                    data-url="fdgdfgfdg/blog/2016/01/23/jsoup-learning-note-3/">
                     <div class="ds-share-inline">
                       <ul  class="ds-share-icons-16">
 
@@ -245,7 +406,7 @@ jsoup从ur... | Microdust:Azeril's blog"
 
                 <!-- 多说评论框 start -->
                 <div class="comment">
-                    <div class="ds-thread" data-thread-key="/blog/2016/01/19/jsoup-learning-note-2" data-title="jsoup学习笔记(二):读取知乎个人首页动态" data-url="fdgdfgfdg/blog/2016/01/19/jsoup-learning-note-2/"></div>
+                    <div class="ds-thread" data-thread-key="/blog/2016/01/23/jsoup-learning-note-3" data-title="jsoup学习笔记(三):模拟登录" data-url="fdgdfgfdg/blog/2016/01/23/jsoup-learning-note-3/"></div>
                 </div>
                 <!-- 多说评论框 end -->
             </div>
