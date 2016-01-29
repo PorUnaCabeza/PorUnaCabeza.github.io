@@ -90,7 +90,6 @@
 <link rel="stylesheet" href="/css/backtop.css">
 <!-- Back Top -->
 <div class="vimiumReset vimiumHUD" style="right: 150px; display: none;"></div>
-<script type="text/javascript" src="/js/backtop.js"></script>
 <!-- Back Top -->
 
 <div id="back-top">
@@ -2252,6 +2251,15 @@
 
 </script>
 <script>
+	function sortTableItem(){
+		var tables=$('table');
+		for(var i=0;i<tables.length;i++){
+			var trs=tables.eq(i).find('tr');
+			for(var j=0;j<trs.length;j++){
+				trs.eq(j).find('th').first().text(j);
+			}
+		}
+	}
     (function () {
         $('#sihaiTabs a').click(function (e) {
             e.preventDefault()
@@ -2261,6 +2269,8 @@
             e.preventDefault()
             $(this).tab('show')
         })
+		sortTableItem();
+		
     })();
 </script>
 <!-- 多说公共JS代码 end -->
