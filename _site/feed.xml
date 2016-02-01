@@ -5,9 +5,38 @@
     <description></description>
     <link>fdgdfgfdg/</link>
     <atom:link href="fdgdfgfdg/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sat, 30 Jan 2016 07:02:42 +0000</pubDate>
-    <lastBuildDate>Sat, 30 Jan 2016 07:02:42 +0000</lastBuildDate>
+    <pubDate>Mon, 01 Feb 2016 09:50:58 +0000</pubDate>
+    <lastBuildDate>Mon, 01 Feb 2016 09:50:58 +0000</lastBuildDate>
     <generator>Jekyll v3.0.1</generator>
+    
+      <item>
+        <title>jsoup学习笔记(四):监控动态与爬取所有动态</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;今日公司年会，微醺&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;在成功登录后，就可以搞一些好玩的事情了&lt;/p&gt;
+
+&lt;p&gt;比如知乎没有提供特别关心某用户的功能，我们可以自己做一个，当关注的用户有新的动态时，发送邮件提醒我们&lt;/p&gt;
+
+&lt;p&gt;或者，爬取某用户的所有动态，来分析他的喜好习惯（以上操作仅是假设学习所用，并没有多大价值，也不建议对身边的人操作）&lt;/p&gt;
+
+&lt;p&gt;待更….&lt;/p&gt;
+</description>
+        <pubDate>Sat, 30 Jan 2016 00:00:00 +0000</pubDate>
+        <link>fdgdfgfdg/blog/2016/01/30/jsoup-learning-note-4/</link>
+        <guid isPermaLink="true">fdgdfgfdg/blog/2016/01/30/jsoup-learning-note-4/</guid>
+        
+        <category>java</category>
+        
+        <category>jsoup</category>
+        
+        <category>html</category>
+        
+        
+        <category>blog</category>
+        
+      </item>
     
       <item>
         <title>jsoup学习笔记(三):模拟登录</title>
