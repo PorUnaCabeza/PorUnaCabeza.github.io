@@ -14,10 +14,10 @@ tags: [java,jsoup,html]
 
 或者，爬取某用户的所有动态，来分析他的喜好习惯
 
-###监控动态
+### 监控动态
 
 
-####1、分析dom，提取信息
+#### 1、分析dom，提取信息
 
 首先分析个人主页的dom结构
 	
@@ -55,7 +55,7 @@ tags: [java,jsoup,html]
 			String href=elmt.select(".zm-profile-activity-page-item-main > a").last().attr("abs:href");
         }
 
-####2、判断最新动态
+#### 2、判断最新动态
 
 上面提到data-time内为该动态的unix时间戳，那么记录下当前最新的data-time，在下一次拉取时，用该次的
 所有data-time与上一次的最新data-time进行比较，大于上一次的皆为新增动态
@@ -70,7 +70,7 @@ tags: [java,jsoup,html]
 	if(elmt.attr("data-time").compareTo(recentNewsTime)>0)
 		updateNews.put(...);
 	
-####3、发送邮件
+#### 3、发送邮件
 
 使用javax.mail包来实现，没啥好讲的，看看api就行
 
@@ -117,6 +117,6 @@ tags: [java,jsoup,html]
         }
     }
 	
-###爬取所有动态
+### 爬取所有动态
 
 待更	
