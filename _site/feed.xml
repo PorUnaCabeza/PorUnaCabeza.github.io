@@ -5,8 +5,8 @@
     <description></description>
     <link>fdgdfgfdg/</link>
     <atom:link href="fdgdfgfdg/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Mon, 01 Feb 2016 09:50:58 +0000</pubDate>
-    <lastBuildDate>Mon, 01 Feb 2016 09:50:58 +0000</lastBuildDate>
+    <pubDate>Fri, 05 Feb 2016 14:35:24 +0000</pubDate>
+    <lastBuildDate>Fri, 05 Feb 2016 14:35:24 +0000</lastBuildDate>
     <generator>Jekyll v3.0.1</generator>
     
       <item>
@@ -19,9 +19,119 @@
 
 &lt;p&gt;比如知乎没有提供特别关心某用户的功能，我们可以自己做一个，当关注的用户有新的动态时，发送邮件提醒我们&lt;/p&gt;
 
-&lt;p&gt;或者，爬取某用户的所有动态，来分析他的喜好习惯（以上操作仅是假设学习所用，并没有多大价值，也不建议对身边的人操作）&lt;/p&gt;
+&lt;p&gt;或者，爬取某用户的所有动态，来分析他的喜好习惯&lt;/p&gt;
 
-&lt;p&gt;待更….&lt;/p&gt;
+&lt;h3 id=&quot;section&quot;&gt;监控动态&lt;/h3&gt;
+
+&lt;h4 id=&quot;dom&quot;&gt;1、分析dom，提取信息&lt;/h4&gt;
+
+&lt;p&gt;首先分析个人主页的dom结构&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;div class=&quot;zm-profile-section-list profile-feed-wrap&quot;&amp;gt;
+	&amp;lt;div id=&quot;zh-profile-activity-page-list&quot;&amp;gt;
+		&amp;lt;div class=&quot;zm-profile-section-item zm-item clearfix&quot; data-time=&quot;1454573143&quot; data-type=&quot;a&quot; data-type-detail=&quot;member_voteup_answer&quot;&amp;gt;
+		...
+		&amp;lt;/div&amp;gt;
+	&amp;lt;/div&amp;gt;
+&amp;lt;/div&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;具体的结构因为太长不太方便展现，可以到知乎去看下&lt;/p&gt;
+
+&lt;p&gt;经过观察，每一条动态都是在”zm-profile-section-item zm-item clearfix”类中的&lt;/p&gt;
+
+&lt;p&gt;其中data-time为unix时间戳&lt;/p&gt;
+
+&lt;p&gt;接着需要得到该动态的题目&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;div class=&quot;zm-profile-section-main zm-profile-section-activity-main zm-profile-activity-page-item-main&quot;&amp;gt;
+	赞同了回答
+	&amp;lt;a class=&quot;question_link&quot; target=&quot;_blank&quot; href=&quot;/question/36305720/answer/67332034&quot;&amp;gt;如果上古卷轴5成为中学必修课会怎样?&amp;lt;/a&amp;gt;
+&amp;lt;/div&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;通过select(‘.zm-profile-activity-page-item-main’).text()可以拿到&lt;/p&gt;
+
+&lt;p&gt;该动态的链接 select(“.zm-profile-activity-page-item-main &amp;gt; a”).last().attr(“abs:href”)&lt;/p&gt;
+
+&lt;p&gt;大概是这个样子：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Elements elmts = doc.select(&quot;.zm-profile-section-item.zm-item.clearfix&quot;);
+    for (Element elmt : elmts) {
+		String time=elmt.attr(&quot;data-time&quot;);
+		String name=elmt.select(&quot;.zm-profile-activity-page-item-main&quot;).text();
+		String href=elmt.select(&quot;.zm-profile-activity-page-item-main &amp;gt; a&quot;).last().attr(&quot;abs:href&quot;);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&quot;section-1&quot;&gt;2、判断最新动态&lt;/h4&gt;
+
+&lt;p&gt;上面提到data-time内为该动态的unix时间戳，那么记录下当前最新的data-time，在下一次拉取时，用该次的
+所有data-time与上一次的最新data-time进行比较，大于上一次的皆为新增动态&lt;/p&gt;
+
+&lt;p&gt;定义一个recentNewsTime记录当前最新data-time&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;recentNewsTime=elmts.get(0).attr(&quot;data-time&quot;);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;定义一个updateNews来记录最新动态列表
+每次拉取时：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;if(elmt.attr(&quot;data-time&quot;).compareTo(recentNewsTime)&amp;gt;0)
+	updateNews.put(...);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&quot;section-2&quot;&gt;3、发送邮件&lt;/h4&gt;
+
+&lt;p&gt;使用javax.mail包来实现，没啥好讲的，看看api就行&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public void sendMail(Map&amp;lt;String,String&amp;gt; news) {
+    Properties props=new Properties();
+    try {
+        ClassLoader loader = ZhihuUtil.class.getClassLoader();
+        InputStream in = loader.getResourceAsStream(&quot;mailConfig.properties&quot;);
+        props.load(in);
+        System.out.println(props);
+    } catch (FileNotFoundException e) {
+        e.printStackTrace();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    Session session = Session.getInstance(props);
+    Transport ts = null;
+    try {
+        ts = session.getTransport();
+        ts.connect(props.getProperty(&quot;mail.smtp.host&quot;), props.getProperty(&quot;username&quot;), props.getProperty(&quot;password&quot;));
+        MimeMessage message = new MimeMessage(session);
+        //发件人
+        message.setFrom(new InternetAddress(&quot;makpia@163.com&quot;));
+        //收件人
+        message.setRecipient(Message.RecipientType.TO, new InternetAddress(&quot;makpia@163.com&quot;));
+        message.setSubject(sdf.format(System.currentTimeMillis()) + &quot;有新动态&quot;);
+        emailContent.setLength(0);
+        for (Map.Entry&amp;lt;String, String&amp;gt; entry : news.entrySet()) {
+            date.setTime(Long.parseLong(entry.getKey()) * 1000);
+            emailContent.append(sdf.format(date)+entry.getValue()+&quot;&amp;lt;br&amp;gt;&quot;);
+        }
+        message.setContent(emailContent.toString(), &quot;text/html;charset=UTF-8&quot;);
+        ts.sendMessage(message, message.getAllRecipients());
+        log.info(&quot;邮件发送成功!&quot;);
+    } catch (Exception e) {
+        log.info(&quot;发送邮件失败,请检查邮件配置&quot;);
+        e.printStackTrace();
+    } finally {
+        try {
+            ts.close();
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section-3&quot;&gt;爬取所有动态&lt;/h3&gt;
+
+&lt;p&gt;待更&lt;/p&gt;
 </description>
         <pubDate>Sat, 30 Jan 2016 00:00:00 +0000</pubDate>
         <link>fdgdfgfdg/blog/2016/01/30/jsoup-learning-note-4/</link>

@@ -124,9 +124,119 @@
 
 <p>比如知乎没有提供特别关心某用户的功能，我们可以自己做一个，当关注的用户有新的动态时，发送邮件提醒我们</p>
 
-<p>或者，爬取某用户的所有动态，来分析他的喜好习惯（以上操作仅是假设学习所用，并没有多大价值，也不建议对身边的人操作）</p>
+<p>或者，爬取某用户的所有动态，来分析他的喜好习惯</p>
 
-<p>待更….</p>
+<h3 id="section">监控动态</h3>
+
+<h4 id="dom">1、分析dom，提取信息</h4>
+
+<p>首先分析个人主页的dom结构</p>
+
+<pre><code>&lt;div class="zm-profile-section-list profile-feed-wrap"&gt;
+	&lt;div id="zh-profile-activity-page-list"&gt;
+		&lt;div class="zm-profile-section-item zm-item clearfix" data-time="1454573143" data-type="a" data-type-detail="member_voteup_answer"&gt;
+		...
+		&lt;/div&gt;
+	&lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>具体的结构因为太长不太方便展现，可以到知乎去看下</p>
+
+<p>经过观察，每一条动态都是在”zm-profile-section-item zm-item clearfix”类中的</p>
+
+<p>其中data-time为unix时间戳</p>
+
+<p>接着需要得到该动态的题目</p>
+
+<pre><code>&lt;div class="zm-profile-section-main zm-profile-section-activity-main zm-profile-activity-page-item-main"&gt;
+	赞同了回答
+	&lt;a class="question_link" target="_blank" href="/question/36305720/answer/67332034"&gt;如果上古卷轴5成为中学必修课会怎样?&lt;/a&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>通过select(‘.zm-profile-activity-page-item-main’).text()可以拿到</p>
+
+<p>该动态的链接 select(“.zm-profile-activity-page-item-main &gt; a”).last().attr(“abs:href”)</p>
+
+<p>大概是这个样子：</p>
+
+<pre><code>Elements elmts = doc.select(".zm-profile-section-item.zm-item.clearfix");
+    for (Element elmt : elmts) {
+		String time=elmt.attr("data-time");
+		String name=elmt.select(".zm-profile-activity-page-item-main").text();
+		String href=elmt.select(".zm-profile-activity-page-item-main &gt; a").last().attr("abs:href");
+    }
+</code></pre>
+
+<h4 id="section-1">2、判断最新动态</h4>
+
+<p>上面提到data-time内为该动态的unix时间戳，那么记录下当前最新的data-time，在下一次拉取时，用该次的
+所有data-time与上一次的最新data-time进行比较，大于上一次的皆为新增动态</p>
+
+<p>定义一个recentNewsTime记录当前最新data-time</p>
+
+<pre><code>recentNewsTime=elmts.get(0).attr("data-time");
+</code></pre>
+
+<p>定义一个updateNews来记录最新动态列表
+每次拉取时：</p>
+
+<pre><code>if(elmt.attr("data-time").compareTo(recentNewsTime)&gt;0)
+	updateNews.put(...);
+</code></pre>
+
+<h4 id="section-2">3、发送邮件</h4>
+
+<p>使用javax.mail包来实现，没啥好讲的，看看api就行</p>
+
+<pre><code>public void sendMail(Map&lt;String,String&gt; news) {
+    Properties props=new Properties();
+    try {
+        ClassLoader loader = ZhihuUtil.class.getClassLoader();
+        InputStream in = loader.getResourceAsStream("mailConfig.properties");
+        props.load(in);
+        System.out.println(props);
+    } catch (FileNotFoundException e) {
+        e.printStackTrace();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    Session session = Session.getInstance(props);
+    Transport ts = null;
+    try {
+        ts = session.getTransport();
+        ts.connect(props.getProperty("mail.smtp.host"), props.getProperty("username"), props.getProperty("password"));
+        MimeMessage message = new MimeMessage(session);
+        //发件人
+        message.setFrom(new InternetAddress("makpia@163.com"));
+        //收件人
+        message.setRecipient(Message.RecipientType.TO, new InternetAddress("makpia@163.com"));
+        message.setSubject(sdf.format(System.currentTimeMillis()) + "有新动态");
+        emailContent.setLength(0);
+        for (Map.Entry&lt;String, String&gt; entry : news.entrySet()) {
+            date.setTime(Long.parseLong(entry.getKey()) * 1000);
+            emailContent.append(sdf.format(date)+entry.getValue()+"&lt;br&gt;");
+        }
+        message.setContent(emailContent.toString(), "text/html;charset=UTF-8");
+        ts.sendMessage(message, message.getAllRecipients());
+        log.info("邮件发送成功!");
+    } catch (Exception e) {
+        log.info("发送邮件失败,请检查邮件配置");
+        e.printStackTrace();
+    } finally {
+        try {
+            ts.close();
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+
+<h3 id="section-3">爬取所有动态</h3>
+
+<p>待更</p>
 
 
                 <hr>
