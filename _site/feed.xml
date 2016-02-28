@@ -5,9 +5,326 @@
     <description></description>
     <link>fdgdfgfdg/</link>
     <atom:link href="fdgdfgfdg/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 05 Feb 2016 14:39:08 +0000</pubDate>
-    <lastBuildDate>Fri, 05 Feb 2016 14:39:08 +0000</lastBuildDate>
+    <pubDate>Sun, 28 Feb 2016 13:20:50 +0000</pubDate>
+    <lastBuildDate>Sun, 28 Feb 2016 13:20:50 +0000</lastBuildDate>
     <generator>Jekyll v3.0.1</generator>
+    
+      <item>
+        <title>Datatables学习小记</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;最近在自己写的一些玩具内经常要用到表格，在用html+jquery实现了一些后，深感麻烦，于是便找了一个插件来用用&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;前段时间，写了几个统计游戏信息的网页：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://cabeza.cn/pw.html&quot; target=&quot;_blank&quot;&gt;&lt;strong&gt;统计游戏内角色物品&lt;/strong&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://cabeza.cn/tianzun.html&quot;&gt;&lt;strong&gt;天尊区顶级角色统计&lt;/strong&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;里面都涉及到很多表格的操作，我都是用jquery来简单操纵，对于这样功能不复杂的网页已经足够&lt;/p&gt;
+
+&lt;p&gt;但是最近写的几个页面要设计大量关于表格的操作，于是便找了个jquery表格插件Datatables来用用&lt;/p&gt;
+
+&lt;h3 id=&quot;datatables&quot;&gt;关于Datatables&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://datatables.club/&quot; target=&quot;_blank&quot;&gt;&lt;strong&gt;Datatables中文网&lt;/strong&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://datatables.net/&quot; target=&quot;_blank&quot;&gt;&lt;strong&gt;Datatables官网&lt;/strong&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;起步&lt;/h3&gt;
+
+&lt;p&gt;你需要&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;引入Datatables的js和css文件&lt;/li&gt;
+  &lt;li&gt;在html内画一个table&lt;/li&gt;
+  &lt;li&gt;执行$(‘table的选择器’).datatable();&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;参考：&lt;a href=&quot;http://datatables.club/manual/install.html&quot; target=&quot;_blank&quot;&gt;Datatables的安装&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;根据服务器返回的数据初始化表格&lt;/h3&gt;
+
+&lt;p&gt;Datatables使用的数据源必须是一个数组，数组里的每一项将显示在你定义的行上面，
+datatables可以使用三种基本的javascript数据类型来作为数据源：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;数组(Arrays [])&lt;/li&gt;
+  &lt;li&gt;对象(objects {})&lt;/li&gt;
+  &lt;li&gt;实例(new myclass())&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;下面说下用的比较多的从对象初始化&lt;/p&gt;
+
+&lt;p&gt;对象格式：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var vehicleData=
+	[
+		{
+			&quot;id&quot;:&quot;12&quot;,
+			&quot;plateNumber&quot;:&quot;苏A0651&quot;,
+			&quot;ownerName&quot;:&quot;张全蛋&quot;,
+			&quot;ownerTel&quot;:&quot;233&quot;,
+			&quot;ownerIdNumber&quot;:&quot;9527&quot;,
+			&quot;ownerAddress&quot;:&quot;南京&quot;
+		},
+		{
+			&quot;id&quot;:&quot;13&quot;,
+			&quot;plateNumber&quot;:&quot;苏B001&quot;,
+			&quot;ownerName&quot;:&quot;唐马儒&quot;,
+			&quot;ownerTel&quot;:&quot;344&quot;,
+			&quot;ownerIdNumber&quot;:&quot;1234&quot;,
+			&quot;ownerAddress&quot;:&quot;南京&quot;
+		}
+	]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;html：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;table id=&quot;vehicleTable&quot;&amp;gt;
+	&amp;lt;thead&amp;gt;
+		&amp;lt;tr&amp;gt;
+			&amp;lt;th&amp;gt;&amp;lt;/th&amp;gt;
+			&amp;lt;th&amp;gt;&amp;lt;/th&amp;gt;
+			&amp;lt;th&amp;gt;&amp;lt;/th&amp;gt;
+			&amp;lt;th&amp;gt;&amp;lt;/th&amp;gt;
+			&amp;lt;th&amp;gt;&amp;lt;/th&amp;gt;
+			&amp;lt;th&amp;gt;&amp;lt;/th&amp;gt;
+			&amp;lt;th&amp;gt;&amp;lt;/th&amp;gt;
+		&amp;lt;/tr&amp;gt;
+	&amp;lt;/thead&amp;gt;
+	&amp;lt;tbody&amp;gt;
+
+	&amp;lt;/tbody&amp;gt;
+&amp;lt;/table&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;创建表格：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$(&#39;#vehicleTable&#39;).dataTable({
+    data:vehicleData,
+    columnDefs: [
+        {
+            targets: 0,
+            data:&#39;id&#39;,
+            title:&#39;id&#39;
+        },
+        {
+            targets:1,
+            data:&#39;plateNumber&#39;,
+            title:&#39;车牌&#39;
+        },
+        {
+            targets:3,
+            data:&#39;ownerName&#39;,
+            title:&#39;车主&#39;
+        },
+        {
+            targets:4,
+            data:&#39;ownerTel&#39;,
+            title:&#39;电话&#39;
+        },
+        {
+            targets:5,
+            data:&#39;ownerIdNumber&#39;,
+            title:&#39;车主身份证&#39;
+        },
+        {
+            targets:6,
+            data:&#39;ownerAddress&#39;,
+            title:&#39;地址&#39;
+        }
+    ]
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;使用&lt;kbd&gt;columnDefs&lt;/kbd&gt;参数给列定义，使用&lt;kbd&gt;targets&lt;/kbd&gt;告诉这个定义是指向哪一列
+&lt;kbd&gt;data&lt;/kbd&gt;用来设置列的数据源，&lt;kbd&gt;title&lt;/kbd&gt;设定该列的标题。&lt;/p&gt;
+
+&lt;p&gt;有些数据不希望显示在屏幕上，或者需要什么条件才会显示，可以使用&lt;kbd&gt;visible&lt;/kbd&gt;选项来控制&lt;/p&gt;
+
+&lt;p&gt;如：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+	targets: 0,
+	data:&#39;id&#39;,
+	title:&#39;id&#39;,
+	visible: false
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;一般来讲，隐藏时也要禁止该数据参与排序与搜索：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+	targets: 0,
+	data:&#39;id&#39;,
+	title:&#39;id&#39;,
+	visible: false,
+	searchable: false，
+	orderable: false
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样，一张表格就会展示出来了&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;此处仅展示外观仅是表格主体部分，因为一些原因不便于加载js，并不能实现全部功能，&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;一个完整的Datatables表格 &lt;a href=&quot;http://datatables.club/example/basic_init/flexible_width.html&quot;&gt;&lt;strong&gt;例子&lt;/strong&gt;&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+
+&lt;table id=&quot;vehicleTable&quot; class=&quot;table&quot;&gt;
+	&lt;thead&gt;
+		&lt;tr role=&quot;row&quot;&gt;
+			&lt;th class=&quot;sorting&quot; rowspan=&quot;1&quot; colspan=&quot;1&quot;&gt;车牌&lt;/th&gt;
+			&lt;th class=&quot;sorting&quot; rowspan=&quot;1&quot; colspan=&quot;1&quot;&gt;车主&lt;/th&gt;
+			&lt;th class=&quot;sorting&quot; rowspan=&quot;1&quot; colspan=&quot;1&quot;&gt;电话&lt;/th&gt;
+			&lt;th class=&quot;sorting&quot; rowspan=&quot;1&quot; colspan=&quot;1&quot;&gt;车主身份证&lt;/th&gt;
+			&lt;th class=&quot;sorting&quot; rowspan=&quot;1&quot; colspan=&quot;1&quot;&gt;地址&lt;/th&gt;
+		&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+		&lt;tr role=&quot;row&quot; class=&quot;odd&quot;&gt;
+			&lt;td&gt;苏A0651&lt;/td&gt;
+			&lt;td&gt;张全蛋&lt;/td&gt;
+			&lt;td&gt;233&lt;/td&gt;
+			&lt;td&gt;9527&lt;/td&gt;
+			&lt;td&gt;南京&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr role=&quot;row&quot; class=&quot;odd&quot;&gt;
+			&lt;td&gt;苏B001&lt;/td&gt;
+			&lt;td&gt;唐马儒&lt;/td&gt;
+			&lt;td&gt;344&lt;/td&gt;
+			&lt;td&gt;1234&lt;/td&gt;
+			&lt;td&gt;南京&lt;/td&gt;
+		&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;如果想给每一行增加几个操作按钮,使用&lt;kbd&gt;defaultContent&lt;/kbd&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;columnDefs: 
+	[
+		//前面的省略
+		{
+			targets:7,
+			data:null,
+			searchable:false,
+			orderable:false，
+			defaultContent:&#39;&amp;lt;button type=&quot;button&quot; class=&quot;btn btn-danger btn-sm vehicle-del&quot;&amp;gt;删除&amp;lt;/button&amp;gt;&#39; +
+			&#39;&amp;lt;button type=&quot;button&quot; class=&quot;btn btn-primary btn-sm vehicle-update&quot;&amp;gt;更改&amp;lt;/button&amp;gt;&#39;
+		}
+	]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;结果：&lt;/p&gt;
+
+&lt;table id=&quot;vehicleTable&quot; class=&quot;table&quot;&gt;
+	&lt;thead&gt;
+		&lt;tr role=&quot;row&quot;&gt;
+			&lt;th class=&quot;sorting&quot; rowspan=&quot;1&quot; colspan=&quot;1&quot;&gt;车牌&lt;/th&gt;
+			&lt;th class=&quot;sorting&quot; rowspan=&quot;1&quot; colspan=&quot;1&quot;&gt;车主&lt;/th&gt;
+			&lt;th class=&quot;sorting&quot; rowspan=&quot;1&quot; colspan=&quot;1&quot;&gt;电话&lt;/th&gt;
+			&lt;th class=&quot;sorting&quot; rowspan=&quot;1&quot; colspan=&quot;1&quot;&gt;车主身份证&lt;/th&gt;
+			&lt;th class=&quot;sorting&quot; rowspan=&quot;1&quot; colspan=&quot;1&quot;&gt;地址&lt;/th&gt;
+			&lt;th class=&quot;sorting&quot; rowspan=&quot;1&quot; colspan=&quot;1&quot;&gt;操作&lt;/th&gt;
+		&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+		&lt;tr role=&quot;row&quot; class=&quot;odd&quot;&gt;
+			&lt;td&gt;苏A0651&lt;/td&gt;
+			&lt;td&gt;张全蛋&lt;/td&gt;
+			&lt;td&gt;233&lt;/td&gt;
+			&lt;td&gt;9527&lt;/td&gt;
+			&lt;td&gt;南京&lt;/td&gt;
+			&lt;td&gt;
+				&lt;button type=&quot;button&quot; class=&quot;btn btn-danger btn-sm vehicle-del&quot; vehicleid=&quot;12&quot; index=&quot;0&quot;&gt;删除&lt;/button&gt;
+				&lt;button type=&quot;button&quot; class=&quot;btn btn-primary btn-sm vehicle-update&quot; vehicleid=&quot;12&quot; index=&quot;0&quot;&gt;更改&lt;/button&gt;
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr role=&quot;row&quot; class=&quot;odd&quot;&gt;
+			&lt;td&gt;苏B001&lt;/td&gt;
+			&lt;td&gt;唐马儒&lt;/td&gt;
+			&lt;td&gt;344&lt;/td&gt;
+			&lt;td&gt;1234&lt;/td&gt;
+			&lt;td&gt;南京&lt;/td&gt;
+			&lt;td&gt;
+				&lt;button type=&quot;button&quot; class=&quot;btn btn-danger btn-sm vehicle-del&quot; vehicleid=&quot;12&quot; index=&quot;0&quot;&gt;删除&lt;/button&gt;
+				&lt;button type=&quot;button&quot; class=&quot;btn btn-primary btn-sm vehicle-update&quot; vehicleid=&quot;12&quot; index=&quot;0&quot;&gt;更改&lt;/button&gt;
+			&lt;/td&gt;
+		&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;我们是需要根据按钮执行一些操作的，因为按钮是动态添加上的，所以监听的绑定要放在回调函数里&lt;/p&gt;
+
+&lt;h4 id=&quot;rowcallbackbuttonid&quot;&gt;通过rowCallback回调函数为每一个button添加数据的id&lt;/h4&gt;
+
+&lt;p&gt;在每一行绘制后，会调用该函数，其包含三个参数：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;row：该行的dom元素&lt;/li&gt;
+  &lt;li&gt;data：该行的源数据&lt;/li&gt;
+  &lt;li&gt;index: 该行的序列&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;在dataTable方法内可以这样写：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;columnDefs: [
+	//前面的省略
+	rowCallback:function( row, data, index ){
+		var id=data.id;
+		$(&#39;td&#39;,row).last().find(&#39;button&#39;).attr(&#39;vehicleId&#39;,id).attr(&quot;index&quot;,index);
+	}
+]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&quot;drawcallback&quot;&gt;在drawCallback回调函数内绑定监听&lt;/h4&gt;
+
+&lt;p&gt;当每次表格重绘的时候触发drawCallback，比如更新数据后或者创建新的元素&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;drawCallback:function(){
+        $(&#39;.vehicle-del&#39;).click(function(){
+           dosomethig
+        });
+        $(&#39;.vehicle-update&#39;).click(function(){
+           dosomethig 
+        });
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;apirowrowdata&quot;&gt;进阶：使用api内提供的row()与row().data()实现上文功能&lt;/h3&gt;
+
+&lt;p&gt;使用两个回调函数来实现一个简单的功能看起来实在是太蠢了，于是遍访api后我发现了这样一个函数&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;row()：Working with rows is a fundamental part of DataTables, and you want to be able to easily select the rows that you want from the table.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;简单来讲，使用row()得到点击事件所发生的行，然后使用row().data()函数拿到该行数据&lt;/p&gt;
+
+&lt;p&gt;例子：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$(&#39;#vehicleTable tbody&#39;).on(&#39;click&#39;,&#39;button&#39;,function(){
+	var tr=$(this).parents(&#39;tr&#39;);
+	var rowData=table.api().row(tr).data();
+	//此处rowData即该行数据
+	dosomethig
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+</description>
+        <pubDate>Sun, 28 Feb 2016 00:00:00 +0000</pubDate>
+        <link>fdgdfgfdg/blog/2016/02/28/datatable-learning-note-1/</link>
+        <guid isPermaLink="true">fdgdfgfdg/blog/2016/02/28/datatable-learning-note-1/</guid>
+        
+        <category>JavaScript</category>
+        
+        <category>Datatables</category>
+        
+        <category>html</category>
+        
+        
+        <category>blog</category>
+        
+      </item>
     
       <item>
         <title>jsoup学习笔记(四):监控动态与爬取所有动态</title>
