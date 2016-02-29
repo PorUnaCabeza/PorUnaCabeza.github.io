@@ -10,7 +10,7 @@
 
     <title>jsoup学习笔记(三):模拟登录 - Namárië</title>
 
-    <link rel="canonical" href="fdgdfgfdg/blog/2016/01/23/jsoup-learning-note-3/">
+    <link rel="canonical" href="cabeza.cn/blog/2016/01/23/jsoup-learning-note-3/">
 
     <!-- Icons -->
   <link rel="shortcut icon" href="/img/favicon.ico">
@@ -128,7 +128,7 @@
 
 <p>拿到cookie值后，在程序里硬编码写入</p>
 
-<pre><code>Connection con = Jsoup.connect("https://www.zhihu.com");//获取连接
+<div class="highlighter-rouge"><pre class="highlight"><code>Connection con = Jsoup.connect("https://www.zhihu.com");//获取连接
 con.header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:29.0) Gecko/20100101 Firefox/29.0");//配置模拟浏览器
 Map&lt;String, String&gt; cookie = new HashMap&lt;&gt;();
 cookie.put("_xsrf", "af8cfcba675ae98ae5a6e238b2844238");
@@ -142,6 +142,7 @@ Connection.Response rs = con.execute();
 Document doc = Jsoup.parse(rs.body());
 System.out.println(doc);
 </code></pre>
+</div>
 
 <p>结果如之前所料，是已登录的状态</p>
 
@@ -166,12 +167,13 @@ System.out.println(doc);
 
 <p>随便填几个值，点登录，使用chrome开发者工具中的network功能抓取请求头form data：</p>
 
-<pre><code>_xsrf:88d1ff7fd5a1f66f306b8f720a7322b8
+<div class="highlighter-rouge"><pre class="highlight"><code>_xsrf:88d1ff7fd5a1f66f306b8f720a7322b8
 password:123456
 captcha:1234
 remember_me:true
 email:12345678
 </code></pre>
+</div>
 
 <p>发现五个字段</p>
 
@@ -184,13 +186,14 @@ email:12345678
 
 <p>只有_xsrf不知其意，查看网页源代码，发现</p>
 
-<pre><code>&lt;input type="hidden" name="_xsrf" value="88d1ff7fd5a1f66f306b8f720a7322b8"&gt;
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;input type="hidden" name="_xsrf" value="88d1ff7fd5a1f66f306b8f720a7322b8"&gt;
 </code></pre>
+</div>
 
 <p>ok，管你是什么意思，我先发一次请求拿到你，第二次的时候直接塞进去不就得了
 如码所示：</p>
 
-<pre><code>public void getXsrf() {
+<div class="highlighter-rouge"><pre class="highlight"><code>public void getXsrf() {
 		con = Jsoup.connect("http://www.zhihu.com");
 		con.header("User-Agent", userAgent);
 		try {
@@ -204,13 +207,15 @@ email:12345678
 		log.info("已获得xsrf");
 	}
 </code></pre>
+</div>
 
 <h4 id="section-3">3.如何获取验证码</h4>
 
 <p>查看网页源代码</p>
 
-<pre><code>&lt;img class="js-refresh-captcha captcha" width="120" height="30" data-tip="s$t$看不清楚？换一张" alt="验证码" src="/captcha.gif?r=1453549553883"&gt;
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;img class="js-refresh-captcha captcha" width="120" height="30" data-tip="s$t$看不清楚？换一张" alt="验证码" src="/captcha.gif?r=1453549553883"&gt;
 </code></pre>
+</div>
 
 <p>得到验证码地址：</p>
 
@@ -222,7 +227,7 @@ email:12345678
 
 <p>下一步，代码实现下载验证码到本地，并保存该验证码的cookie，为后面登录做准备</p>
 
-<pre><code>private Map&lt;String,String&gt; captchaCookies =new HashMap&lt;&gt;();
+<div class="highlighter-rouge"><pre class="highlight"><code>private Map&lt;String,String&gt; captchaCookies =new HashMap&lt;&gt;();
 ....
 public void getCaptcha() {
 		captchaCookies.clear();
@@ -246,12 +251,13 @@ public void getCaptcha() {
 		log.info("验证码已保存" + ",路径为:" + file.getAbsolutePath());
 	}
 </code></pre>
+</div>
 
 <p>验证码和对应cookie拿到后，下面就是登录了</p>
 
 <h4 id="section-4">4.根据上述五个字段，实现登录</h4>
 
-<pre><code>public void getLoginCookies() {
+<div class="highlighter-rouge"><pre class="highlight"><code>public void getLoginCookies() {
     loginCookies.clear();
     Scanner sc=new Scanner(System.in);
     getXsrf();	//获取_xsrf
@@ -277,11 +283,12 @@ public void getCaptcha() {
     loginCookies.putAll(rs.cookies());
 }
 </code></pre>
+</div>
 
 <h4 id="section-5">5.一些后续工作</h4>
 <p>拿到登录cookie后，为了方便下次登录，可以将cookie保存到文件，下次先从文件读取cookie登录，若失败，再使用上文方法登录</p>
 
-<pre><code>public void saveCookies(String fileName, Map&lt;String, String&gt; cookies) {
+<div class="highlighter-rouge"><pre class="highlight"><code>public void saveCookies(String fileName, Map&lt;String, String&gt; cookies) {
     FileOutputStream fos = null;
     try {
         fos = new FileOutputStream(fileName);
@@ -320,10 +327,11 @@ public void readCookies(String filename) {
     log.info(loginCookies);
 }
 </code></pre>
+</div>
 
 <p>从文件读取cookie登录</p>
 
-<pre><code>public boolean loginBySavedCookies() {
+<div class="highlighter-rouge"><pre class="highlight"><code>public boolean loginBySavedCookies() {
     readCookies("zhihu_cookies.txt");
     con = Jsoup.connect("https://www.zhihu.com");//获取连接
     con.header("User-Agent", userAgent);//配置模拟浏览器
@@ -341,6 +349,7 @@ public void readCookies(String filename) {
     return login();
 }
 </code></pre>
+</div>
 
 <p>至此，一个简单的模拟登录程序就完成了</p>
 
@@ -375,7 +384,7 @@ public void readCookies(String filename) {
 
                 <div class="ds-share"
                     data-thread-key="/blog/2016/01/23/jsoup-learning-note-3" data-title="jsoup学习笔记(三):模拟登录"
-                    data-images="fdgdfgfdg/img/facebook.jpg"
+                    data-images="cabeza.cn/img/facebook.jpg"
                     data-content="
   如上文所述，未登录状态爬取信息时会有很多限制，那么就来看看如何模拟登录知乎
 
@@ -383,7 +392,7 @@ public void readCookies(String filename) {
 采用最暴力的方法：硬塞cookie
 
 首先，在浏览器上登录帐号，然后... | Cabeza's blog"
-                    data-url="fdgdfgfdg/blog/2016/01/23/jsoup-learning-note-3/">
+                    data-url="cabeza.cn/blog/2016/01/23/jsoup-learning-note-3/">
                     <div class="ds-share-inline">
                       <ul  class="ds-share-icons-16">
 
@@ -402,7 +411,7 @@ public void readCookies(String filename) {
 
                 <!-- 多说评论框 start -->
                 <div class="comment">
-                    <div class="ds-thread" data-thread-key="/blog/2016/01/23/jsoup-learning-note-3" data-title="jsoup学习笔记(三):模拟登录" data-url="fdgdfgfdg/blog/2016/01/23/jsoup-learning-note-3/"></div>
+                    <div class="ds-thread" data-thread-key="/blog/2016/01/23/jsoup-learning-note-3" data-title="jsoup学习笔记(三):模拟登录" data-url="cabeza.cn/blog/2016/01/23/jsoup-learning-note-3/"></div>
                 </div>
                 <!-- 多说评论框 end -->
             </div>

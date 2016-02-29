@@ -3,10 +3,10 @@
   <channel>
     <title>Namárië</title>
     <description></description>
-    <link>fdgdfgfdg/</link>
-    <atom:link href="fdgdfgfdg/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sun, 28 Feb 2016 14:43:44 +0000</pubDate>
-    <lastBuildDate>Sun, 28 Feb 2016 14:43:44 +0000</lastBuildDate>
+    <link>cabeza.cn/</link>
+    <atom:link href="cabeza.cn/feed.xml" rel="self" type="application/rss+xml" />
+    <pubDate>Sun, 28 Feb 2016 15:33:20 +0000</pubDate>
+    <lastBuildDate>Sun, 28 Feb 2016 15:33:20 +0000</lastBuildDate>
     <generator>Jekyll v3.0.1</generator>
     
       <item>
@@ -58,7 +58,7 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
 &lt;p&gt;对象格式：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;var vehicleData=
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;var vehicleData=
 	[
 		{
 			&quot;id&quot;:&quot;12&quot;,
@@ -78,10 +78,11 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 		}
 	]
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;html：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;lt;table id=&quot;vehicleTable&quot;&amp;gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;table id=&quot;vehicleTable&quot;&amp;gt;
 	&amp;lt;thead&amp;gt;
 		&amp;lt;tr&amp;gt;
 			&amp;lt;th&amp;gt;&amp;lt;/th&amp;gt;
@@ -98,10 +99,11 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 	&amp;lt;/tbody&amp;gt;
 &amp;lt;/table&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;创建表格：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;$(&#39;#vehicleTable&#39;).dataTable({
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$(&#39;#vehicleTable&#39;).dataTable({
     data:vehicleData,
     columnDefs: [
         {
@@ -137,6 +139,7 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
     ]
 });
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;使用&lt;kbd&gt;columnDefs&lt;/kbd&gt;参数给列定义，使用&lt;kbd&gt;targets&lt;/kbd&gt;告诉这个定义是指向哪一列
 &lt;kbd&gt;data&lt;/kbd&gt;用来设置列的数据源，&lt;kbd&gt;title&lt;/kbd&gt;设定该列的标题。&lt;/p&gt;
@@ -145,25 +148,27 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
 &lt;p&gt;如：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;{
-	targets: 0,
-	data:&#39;id&#39;,
-	title:&#39;id&#39;,
-	visible: false
-}
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;targets:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;0,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;data:&#39;id&#39;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;title:&#39;id&#39;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;visible:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;一般来讲，隐藏时也要禁止该数据参与排序与搜索：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;{
-	targets: 0,
-	data:&#39;id&#39;,
-	title:&#39;id&#39;,
-	visible: false,
-	searchable: false，
-	orderable: false
-}
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;targets:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;0,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;data:&#39;id&#39;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;title:&#39;id&#39;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;visible:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;false,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;searchable:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;false，&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;orderable:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;这样，一张表格就会展示出来了&lt;/p&gt;
 
@@ -201,7 +206,7 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
 &lt;p&gt;如果想给每一行增加几个操作按钮,使用&lt;kbd&gt;defaultContent&lt;/kbd&gt;:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;columnDefs: 
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;columnDefs: 
 	[
 		//前面的省略
 		{
@@ -214,6 +219,7 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 		}
 	]
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;结果：&lt;/p&gt;
 
@@ -268,7 +274,7 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
 &lt;p&gt;在dataTable方法内可以这样写：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;columnDefs: [
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;columnDefs: [
 	//前面的省略
 	rowCallback:function( row, data, index ){
 		var id=data.id;
@@ -276,12 +282,13 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 	}
 ]
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;h4 id=&quot;drawcallback&quot;&gt;在drawCallback回调函数内绑定监听&lt;/h4&gt;
 
 &lt;p&gt;当每次表格重绘的时候触发drawCallback，比如更新数据后或者创建新的元素&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;drawCallback:function(){
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;drawCallback:function(){
         $(&#39;.vehicle-del&#39;).click(function(){
            dosomethig
         });
@@ -290,30 +297,33 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
         });
     }
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;h3 id=&quot;apirowrowdata&quot;&gt;进阶：使用api内提供的row()与row().data()实现上文功能&lt;/h3&gt;
 
 &lt;p&gt;使用两个回调函数来实现一个简单的功能看起来实在是太蠢了，于是遍访api后我发现了这样一个函数&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;row()：Working with rows is a fundamental part of DataTables, and you want to be able to easily select the rows that you want from the table.
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;row()：Working with rows is a fundamental part of DataTables, and you want to be able to easily select the rows that you want from the table.
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;简单来讲，使用row()得到点击事件所发生的行，然后使用row().data()函数拿到该行数据&lt;/p&gt;
 
 &lt;p&gt;例子：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;$(&#39;#vehicleTable tbody&#39;).on(&#39;click&#39;,&#39;button&#39;,function(){
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$(&#39;#vehicleTable tbody&#39;).on(&#39;click&#39;,&#39;button&#39;,function(){
 	var tr=$(this).parents(&#39;tr&#39;);
 	var rowData=table.api().row(tr).data();
 	//此处rowData即该行数据
 	dosomethig
 }
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 </description>
         <pubDate>Sun, 28 Feb 2016 00:00:00 +0000</pubDate>
-        <link>fdgdfgfdg/blog/2016/02/28/datatable-learning-note-1/</link>
-        <guid isPermaLink="true">fdgdfgfdg/blog/2016/02/28/datatable-learning-note-1/</guid>
+        <link>cabeza.cn/blog/2016/02/28/datatable-learning-note-1/</link>
+        <guid isPermaLink="true">cabeza.cn/blog/2016/02/28/datatable-learning-note-1/</guid>
         
         <category>JavaScript</category>
         
@@ -344,7 +354,7 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
 &lt;p&gt;首先分析个人主页的dom结构&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;lt;div class=&quot;zm-profile-section-list profile-feed-wrap&quot;&amp;gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;div class=&quot;zm-profile-section-list profile-feed-wrap&quot;&amp;gt;
 	&amp;lt;div id=&quot;zh-profile-activity-page-list&quot;&amp;gt;
 		&amp;lt;div class=&quot;zm-profile-section-item zm-item clearfix&quot; data-time=&quot;1454573143&quot; data-type=&quot;a&quot; data-type-detail=&quot;member_voteup_answer&quot;&amp;gt;
 		...
@@ -352,6 +362,7 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 	&amp;lt;/div&amp;gt;
 &amp;lt;/div&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;具体的结构因为太长不太方便展现，可以到知乎去看下&lt;/p&gt;
 
@@ -361,11 +372,12 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
 &lt;p&gt;接着需要得到该动态的题目&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;lt;div class=&quot;zm-profile-section-main zm-profile-section-activity-main zm-profile-activity-page-item-main&quot;&amp;gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;div class=&quot;zm-profile-section-main zm-profile-section-activity-main zm-profile-activity-page-item-main&quot;&amp;gt;
 	赞同了回答
 	&amp;lt;a class=&quot;question_link&quot; target=&quot;_blank&quot; href=&quot;/question/36305720/answer/67332034&quot;&amp;gt;如果上古卷轴5成为中学必修课会怎样?&amp;lt;/a&amp;gt;
 &amp;lt;/div&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;通过select(‘.zm-profile-activity-page-item-main’).text()可以拿到&lt;/p&gt;
 
@@ -373,13 +385,14 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
 &lt;p&gt;大概是这个样子：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;Elements elmts = doc.select(&quot;.zm-profile-section-item.zm-item.clearfix&quot;);
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Elements elmts = doc.select(&quot;.zm-profile-section-item.zm-item.clearfix&quot;);
     for (Element elmt : elmts) {
 		String time=elmt.attr(&quot;data-time&quot;);
 		String name=elmt.select(&quot;.zm-profile-activity-page-item-main&quot;).text();
 		String href=elmt.select(&quot;.zm-profile-activity-page-item-main &amp;gt; a&quot;).last().attr(&quot;abs:href&quot;);
     }
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;h4 id=&quot;section-1&quot;&gt;2、判断最新动态&lt;/h4&gt;
 
@@ -388,21 +401,23 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
 &lt;p&gt;定义一个recentNewsTime记录当前最新data-time&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;recentNewsTime=elmts.get(0).attr(&quot;data-time&quot;);
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;recentNewsTime=elmts.get(0).attr(&quot;data-time&quot;);
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;定义一个updateNews来记录最新动态列表
 每次拉取时：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;if(elmt.attr(&quot;data-time&quot;).compareTo(recentNewsTime)&amp;gt;0)
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;if(elmt.attr(&quot;data-time&quot;).compareTo(recentNewsTime)&amp;gt;0)
 	updateNews.put(...);
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;h4 id=&quot;section-2&quot;&gt;3、发送邮件&lt;/h4&gt;
 
 &lt;p&gt;使用javax.mail包来实现，没啥好讲的，看看api就行&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;public void sendMail(Map&amp;lt;String,String&amp;gt; news) {
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public void sendMail(Map&amp;lt;String,String&amp;gt; news) {
     Properties props=new Properties();
     try {
         ClassLoader loader = ZhihuUtil.class.getClassLoader();
@@ -445,14 +460,15 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
     }
 }
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;h3 id=&quot;section-3&quot;&gt;爬取所有动态&lt;/h3&gt;
 
 &lt;p&gt;待更&lt;/p&gt;
 </description>
         <pubDate>Sat, 30 Jan 2016 00:00:00 +0000</pubDate>
-        <link>fdgdfgfdg/blog/2016/01/30/jsoup-learning-note-4/</link>
-        <guid isPermaLink="true">fdgdfgfdg/blog/2016/01/30/jsoup-learning-note-4/</guid>
+        <link>cabeza.cn/blog/2016/01/30/jsoup-learning-note-4/</link>
+        <guid isPermaLink="true">cabeza.cn/blog/2016/01/30/jsoup-learning-note-4/</guid>
         
         <category>java</category>
         
@@ -479,7 +495,7 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
 &lt;p&gt;拿到cookie值后，在程序里硬编码写入&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;Connection con = Jsoup.connect(&quot;https://www.zhihu.com&quot;);//获取连接
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Connection con = Jsoup.connect(&quot;https://www.zhihu.com&quot;);//获取连接
 con.header(&quot;User-Agent&quot;, &quot;Mozilla/5.0 (Windows NT 6.1; WOW64; rv:29.0) Gecko/20100101 Firefox/29.0&quot;);//配置模拟浏览器
 Map&amp;lt;String, String&amp;gt; cookie = new HashMap&amp;lt;&amp;gt;();
 cookie.put(&quot;_xsrf&quot;, &quot;af8cfcba675ae98ae5a6e238b2844238&quot;);
@@ -493,6 +509,7 @@ Connection.Response rs = con.execute();
 Document doc = Jsoup.parse(rs.body());
 System.out.println(doc);
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;结果如之前所料，是已登录的状态&lt;/p&gt;
 
@@ -517,12 +534,13 @@ System.out.println(doc);
 
 &lt;p&gt;随便填几个值，点登录，使用chrome开发者工具中的network功能抓取请求头form data：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;_xsrf:88d1ff7fd5a1f66f306b8f720a7322b8
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;_xsrf:88d1ff7fd5a1f66f306b8f720a7322b8
 password:123456
 captcha:1234
 remember_me:true
 email:12345678
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;发现五个字段&lt;/p&gt;
 
@@ -535,13 +553,14 @@ email:12345678
 
 &lt;p&gt;只有_xsrf不知其意，查看网页源代码，发现&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;lt;input type=&quot;hidden&quot; name=&quot;_xsrf&quot; value=&quot;88d1ff7fd5a1f66f306b8f720a7322b8&quot;&amp;gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;input type=&quot;hidden&quot; name=&quot;_xsrf&quot; value=&quot;88d1ff7fd5a1f66f306b8f720a7322b8&quot;&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;ok，管你是什么意思，我先发一次请求拿到你，第二次的时候直接塞进去不就得了
 如码所示：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;public void getXsrf() {
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public void getXsrf() {
 		con = Jsoup.connect(&quot;http://www.zhihu.com&quot;);
 		con.header(&quot;User-Agent&quot;, userAgent);
 		try {
@@ -555,13 +574,15 @@ email:12345678
 		log.info(&quot;已获得xsrf&quot;);
 	}
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;h4 id=&quot;section-3&quot;&gt;3.如何获取验证码&lt;/h4&gt;
 
 &lt;p&gt;查看网页源代码&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;lt;img class=&quot;js-refresh-captcha captcha&quot; width=&quot;120&quot; height=&quot;30&quot; data-tip=&quot;s$t$看不清楚？换一张&quot; alt=&quot;验证码&quot; src=&quot;/captcha.gif?r=1453549553883&quot;&amp;gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;img class=&quot;js-refresh-captcha captcha&quot; width=&quot;120&quot; height=&quot;30&quot; data-tip=&quot;s$t$看不清楚？换一张&quot; alt=&quot;验证码&quot; src=&quot;/captcha.gif?r=1453549553883&quot;&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;得到验证码地址：&lt;/p&gt;
 
@@ -573,7 +594,7 @@ email:12345678
 
 &lt;p&gt;下一步，代码实现下载验证码到本地，并保存该验证码的cookie，为后面登录做准备&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;private Map&amp;lt;String,String&amp;gt; captchaCookies =new HashMap&amp;lt;&amp;gt;();
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;private Map&amp;lt;String,String&amp;gt; captchaCookies =new HashMap&amp;lt;&amp;gt;();
 ....
 public void getCaptcha() {
 		captchaCookies.clear();
@@ -597,12 +618,13 @@ public void getCaptcha() {
 		log.info(&quot;验证码已保存&quot; + &quot;,路径为:&quot; + file.getAbsolutePath());
 	}
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;验证码和对应cookie拿到后，下面就是登录了&lt;/p&gt;
 
 &lt;h4 id=&quot;section-4&quot;&gt;4.根据上述五个字段，实现登录&lt;/h4&gt;
 
-&lt;pre&gt;&lt;code&gt;public void getLoginCookies() {
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public void getLoginCookies() {
     loginCookies.clear();
     Scanner sc=new Scanner(System.in);
     getXsrf();	//获取_xsrf
@@ -628,11 +650,12 @@ public void getCaptcha() {
     loginCookies.putAll(rs.cookies());
 }
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;h4 id=&quot;section-5&quot;&gt;5.一些后续工作&lt;/h4&gt;
 &lt;p&gt;拿到登录cookie后，为了方便下次登录，可以将cookie保存到文件，下次先从文件读取cookie登录，若失败，再使用上文方法登录&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;public void saveCookies(String fileName, Map&amp;lt;String, String&amp;gt; cookies) {
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public void saveCookies(String fileName, Map&amp;lt;String, String&amp;gt; cookies) {
     FileOutputStream fos = null;
     try {
         fos = new FileOutputStream(fileName);
@@ -671,10 +694,11 @@ public void readCookies(String filename) {
     log.info(loginCookies);
 }
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;从文件读取cookie登录&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;public boolean loginBySavedCookies() {
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public boolean loginBySavedCookies() {
     readCookies(&quot;zhihu_cookies.txt&quot;);
     con = Jsoup.connect(&quot;https://www.zhihu.com&quot;);//获取连接
     con.header(&quot;User-Agent&quot;, userAgent);//配置模拟浏览器
@@ -692,12 +716,13 @@ public void readCookies(String filename) {
     return login();
 }
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;至此，一个简单的模拟登录程序就完成了&lt;/p&gt;
 </description>
         <pubDate>Sat, 23 Jan 2016 00:00:00 +0000</pubDate>
-        <link>fdgdfgfdg/blog/2016/01/23/jsoup-learning-note-3/</link>
-        <guid isPermaLink="true">fdgdfgfdg/blog/2016/01/23/jsoup-learning-note-3/</guid>
+        <link>cabeza.cn/blog/2016/01/23/jsoup-learning-note-3/</link>
+        <guid isPermaLink="true">cabeza.cn/blog/2016/01/23/jsoup-learning-note-3/</guid>
         
         <category>java</category>
         
@@ -778,8 +803,8 @@ elmt.select(&quot;.question_link&quot;).attr(&quot;abs:href&quot;);//这时候�
 
 </description>
         <pubDate>Tue, 19 Jan 2016 00:00:00 +0000</pubDate>
-        <link>fdgdfgfdg/blog/2016/01/19/jsoup-learning-note-2/</link>
-        <guid isPermaLink="true">fdgdfgfdg/blog/2016/01/19/jsoup-learning-note-2/</guid>
+        <link>cabeza.cn/blog/2016/01/19/jsoup-learning-note-2/</link>
+        <guid isPermaLink="true">cabeza.cn/blog/2016/01/19/jsoup-learning-note-2/</guid>
         
         <category>java</category>
         
@@ -934,8 +959,8 @@ public void traverse(Node root) {
 
 </description>
         <pubDate>Thu, 14 Jan 2016 00:00:00 +0000</pubDate>
-        <link>fdgdfgfdg/blog/2016/01/14/jsoup-learning-note-1/</link>
-        <guid isPermaLink="true">fdgdfgfdg/blog/2016/01/14/jsoup-learning-note-1/</guid>
+        <link>cabeza.cn/blog/2016/01/14/jsoup-learning-note-1/</link>
+        <guid isPermaLink="true">cabeza.cn/blog/2016/01/14/jsoup-learning-note-1/</guid>
         
         <category>java</category>
         
@@ -955,8 +980,8 @@ public void traverse(Node root) {
 &lt;p&gt;近期将以往博客搬迁过来&lt;/p&gt;
 </description>
         <pubDate>Sun, 03 Jan 2016 00:00:00 +0000</pubDate>
-        <link>fdgdfgfdg/blog/2016/01/03/init-blog/</link>
-        <guid isPermaLink="true">fdgdfgfdg/blog/2016/01/03/init-blog/</guid>
+        <link>cabeza.cn/blog/2016/01/03/init-blog/</link>
+        <guid isPermaLink="true">cabeza.cn/blog/2016/01/03/init-blog/</guid>
         
         <category>生活</category>
         
@@ -1102,8 +1127,8 @@ JNIEXPORT void JNICALL Java_TowerUtil_keyPress
 如果能够再获得游戏内属性基址，就能写出一个功能更丰富的??了&lt;/p&gt;
 </description>
         <pubDate>Wed, 09 Sep 2015 00:00:00 +0000</pubDate>
-        <link>fdgdfgfdg/blog/2015/09/09/use-java-for-game-script/</link>
-        <guid isPermaLink="true">fdgdfgfdg/blog/2015/09/09/use-java-for-game-script/</guid>
+        <link>cabeza.cn/blog/2015/09/09/use-java-for-game-script/</link>
+        <guid isPermaLink="true">cabeza.cn/blog/2015/09/09/use-java-for-game-script/</guid>
         
         <category>java</category>
         

@@ -10,7 +10,7 @@
 
     <title>Datatables学习小记 - Namárië</title>
 
-    <link rel="canonical" href="fdgdfgfdg/blog/2016/02/28/datatable-learning-note-1/">
+    <link rel="canonical" href="cabeza.cn/blog/2016/02/28/datatable-learning-note-1/">
 
     <!-- Icons -->
   <link rel="shortcut icon" href="/img/favicon.ico">
@@ -163,7 +163,7 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
 <p>对象格式：</p>
 
-<pre><code>var vehicleData=
+<div class="highlighter-rouge"><pre class="highlight"><code>var vehicleData=
 	[
 		{
 			"id":"12",
@@ -183,10 +183,11 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 		}
 	]
 </code></pre>
+</div>
 
 <p>html：</p>
 
-<pre><code>&lt;table id="vehicleTable"&gt;
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;table id="vehicleTable"&gt;
 	&lt;thead&gt;
 		&lt;tr&gt;
 			&lt;th&gt;&lt;/th&gt;
@@ -203,10 +204,11 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 	&lt;/tbody&gt;
 &lt;/table&gt;
 </code></pre>
+</div>
 
 <p>创建表格：</p>
 
-<pre><code>$('#vehicleTable').dataTable({
+<div class="highlighter-rouge"><pre class="highlight"><code>$('#vehicleTable').dataTable({
     data:vehicleData,
     columnDefs: [
         {
@@ -242,6 +244,7 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
     ]
 });
 </code></pre>
+</div>
 
 <p>使用<kbd>columnDefs</kbd>参数给列定义，使用<kbd>targets</kbd>告诉这个定义是指向哪一列
 <kbd>data</kbd>用来设置列的数据源，<kbd>title</kbd>设定该列的标题。</p>
@@ -250,25 +253,27 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
 <p>如：</p>
 
-<pre><code>{
-	targets: 0,
-	data:'id',
-	title:'id',
-	visible: false
-}
-</code></pre>
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
+	</span><span class="err">targets:</span><span class="w"> </span><span class="err">0,</span><span class="w">
+	</span><span class="err">data:'id',</span><span class="w">
+	</span><span class="err">title:'id',</span><span class="w">
+	</span><span class="err">visible:</span><span class="w"> </span><span class="err">false</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+</div>
 
 <p>一般来讲，隐藏时也要禁止该数据参与排序与搜索：</p>
 
-<pre><code>{
-	targets: 0,
-	data:'id',
-	title:'id',
-	visible: false,
-	searchable: false，
-	orderable: false
-}
-</code></pre>
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
+	</span><span class="err">targets:</span><span class="w"> </span><span class="err">0,</span><span class="w">
+	</span><span class="err">data:'id',</span><span class="w">
+	</span><span class="err">title:'id',</span><span class="w">
+	</span><span class="err">visible:</span><span class="w"> </span><span class="err">false,</span><span class="w">
+	</span><span class="err">searchable:</span><span class="w"> </span><span class="err">false，</span><span class="w">
+	</span><span class="err">orderable:</span><span class="w"> </span><span class="err">false</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+</div>
 
 <p>这样，一张表格就会展示出来了</p>
 
@@ -306,7 +311,7 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
 <p>如果想给每一行增加几个操作按钮,使用<kbd>defaultContent</kbd>:</p>
 
-<pre><code>columnDefs: 
+<div class="highlighter-rouge"><pre class="highlight"><code>columnDefs: 
 	[
 		//前面的省略
 		{
@@ -319,6 +324,7 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 		}
 	]
 </code></pre>
+</div>
 
 <p>结果：</p>
 
@@ -373,7 +379,7 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
 <p>在dataTable方法内可以这样写：</p>
 
-<pre><code>columnDefs: [
+<div class="highlighter-rouge"><pre class="highlight"><code>columnDefs: [
 	//前面的省略
 	rowCallback:function( row, data, index ){
 		var id=data.id;
@@ -381,12 +387,13 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 	}
 ]
 </code></pre>
+</div>
 
 <h4 id="drawcallback">在drawCallback回调函数内绑定监听</h4>
 
 <p>当每次表格重绘的时候触发drawCallback，比如更新数据后或者创建新的元素</p>
 
-<pre><code>drawCallback:function(){
+<div class="highlighter-rouge"><pre class="highlight"><code>drawCallback:function(){
         $('.vehicle-del').click(function(){
            dosomethig
         });
@@ -395,25 +402,28 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
         });
     }
 </code></pre>
+</div>
 
 <h3 id="apirowrowdata">进阶：使用api内提供的row()与row().data()实现上文功能</h3>
 
 <p>使用两个回调函数来实现一个简单的功能看起来实在是太蠢了，于是遍访api后我发现了这样一个函数</p>
 
-<pre><code>row()：Working with rows is a fundamental part of DataTables, and you want to be able to easily select the rows that you want from the table.
+<div class="highlighter-rouge"><pre class="highlight"><code>row()：Working with rows is a fundamental part of DataTables, and you want to be able to easily select the rows that you want from the table.
 </code></pre>
+</div>
 
 <p>简单来讲，使用row()得到点击事件所发生的行，然后使用row().data()函数拿到该行数据</p>
 
 <p>例子：</p>
 
-<pre><code>$('#vehicleTable tbody').on('click','button',function(){
+<div class="highlighter-rouge"><pre class="highlight"><code>$('#vehicleTable tbody').on('click','button',function(){
 	var tr=$(this).parents('tr');
 	var rowData=table.api().row(tr).data();
 	//此处rowData即该行数据
 	dosomethig
 }
 </code></pre>
+</div>
 
 
 
@@ -443,13 +453,13 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
                 <div class="ds-share"
                     data-thread-key="/blog/2016/02/28/datatable-learning-note-1" data-title="Datatables学习小记"
-                    data-images="fdgdfgfdg/img/facebook.jpg"
+                    data-images="cabeza.cn/img/facebook.jpg"
                     data-content="
   最近在自己写的一些玩具内经常要用到表格，在用html+jquery实现了一些后，深感麻烦，于是便找了一个插件来用用
 
 
 前段时间，写了几个统计游戏信... | Cabeza's blog"
-                    data-url="fdgdfgfdg/blog/2016/02/28/datatable-learning-note-1/">
+                    data-url="cabeza.cn/blog/2016/02/28/datatable-learning-note-1/">
                     <div class="ds-share-inline">
                       <ul  class="ds-share-icons-16">
 
@@ -468,7 +478,7 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
                 <!-- 多说评论框 start -->
                 <div class="comment">
-                    <div class="ds-thread" data-thread-key="/blog/2016/02/28/datatable-learning-note-1" data-title="Datatables学习小记" data-url="fdgdfgfdg/blog/2016/02/28/datatable-learning-note-1/"></div>
+                    <div class="ds-thread" data-thread-key="/blog/2016/02/28/datatable-learning-note-1" data-title="Datatables学习小记" data-url="cabeza.cn/blog/2016/02/28/datatable-learning-note-1/"></div>
                 </div>
                 <!-- 多说评论框 end -->
             </div>

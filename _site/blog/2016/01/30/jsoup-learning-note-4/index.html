@@ -10,7 +10,7 @@
 
     <title>jsoup学习笔记(四):监控动态与爬取所有动态 - Namárië</title>
 
-    <link rel="canonical" href="fdgdfgfdg/blog/2016/01/30/jsoup-learning-note-4/">
+    <link rel="canonical" href="cabeza.cn/blog/2016/01/30/jsoup-learning-note-4/">
 
     <!-- Icons -->
   <link rel="shortcut icon" href="/img/favicon.ico">
@@ -132,7 +132,7 @@
 
 <p>首先分析个人主页的dom结构</p>
 
-<pre><code>&lt;div class="zm-profile-section-list profile-feed-wrap"&gt;
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;div class="zm-profile-section-list profile-feed-wrap"&gt;
 	&lt;div id="zh-profile-activity-page-list"&gt;
 		&lt;div class="zm-profile-section-item zm-item clearfix" data-time="1454573143" data-type="a" data-type-detail="member_voteup_answer"&gt;
 		...
@@ -140,6 +140,7 @@
 	&lt;/div&gt;
 &lt;/div&gt;
 </code></pre>
+</div>
 
 <p>具体的结构因为太长不太方便展现，可以到知乎去看下</p>
 
@@ -149,11 +150,12 @@
 
 <p>接着需要得到该动态的题目</p>
 
-<pre><code>&lt;div class="zm-profile-section-main zm-profile-section-activity-main zm-profile-activity-page-item-main"&gt;
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;div class="zm-profile-section-main zm-profile-section-activity-main zm-profile-activity-page-item-main"&gt;
 	赞同了回答
 	&lt;a class="question_link" target="_blank" href="/question/36305720/answer/67332034"&gt;如果上古卷轴5成为中学必修课会怎样?&lt;/a&gt;
 &lt;/div&gt;
 </code></pre>
+</div>
 
 <p>通过select(‘.zm-profile-activity-page-item-main’).text()可以拿到</p>
 
@@ -161,13 +163,14 @@
 
 <p>大概是这个样子：</p>
 
-<pre><code>Elements elmts = doc.select(".zm-profile-section-item.zm-item.clearfix");
+<div class="highlighter-rouge"><pre class="highlight"><code>Elements elmts = doc.select(".zm-profile-section-item.zm-item.clearfix");
     for (Element elmt : elmts) {
 		String time=elmt.attr("data-time");
 		String name=elmt.select(".zm-profile-activity-page-item-main").text();
 		String href=elmt.select(".zm-profile-activity-page-item-main &gt; a").last().attr("abs:href");
     }
 </code></pre>
+</div>
 
 <h4 id="section-1">2、判断最新动态</h4>
 
@@ -176,21 +179,23 @@
 
 <p>定义一个recentNewsTime记录当前最新data-time</p>
 
-<pre><code>recentNewsTime=elmts.get(0).attr("data-time");
+<div class="highlighter-rouge"><pre class="highlight"><code>recentNewsTime=elmts.get(0).attr("data-time");
 </code></pre>
+</div>
 
 <p>定义一个updateNews来记录最新动态列表
 每次拉取时：</p>
 
-<pre><code>if(elmt.attr("data-time").compareTo(recentNewsTime)&gt;0)
+<div class="highlighter-rouge"><pre class="highlight"><code>if(elmt.attr("data-time").compareTo(recentNewsTime)&gt;0)
 	updateNews.put(...);
 </code></pre>
+</div>
 
 <h4 id="section-2">3、发送邮件</h4>
 
 <p>使用javax.mail包来实现，没啥好讲的，看看api就行</p>
 
-<pre><code>public void sendMail(Map&lt;String,String&gt; news) {
+<div class="highlighter-rouge"><pre class="highlight"><code>public void sendMail(Map&lt;String,String&gt; news) {
     Properties props=new Properties();
     try {
         ClassLoader loader = ZhihuUtil.class.getClassLoader();
@@ -233,6 +238,7 @@
     }
 }
 </code></pre>
+</div>
 
 <h3 id="section-3">爬取所有动态</h3>
 
@@ -269,7 +275,7 @@
 
                 <div class="ds-share"
                     data-thread-key="/blog/2016/01/30/jsoup-learning-note-4" data-title="jsoup学习笔记(四):监控动态与爬取所有动态"
-                    data-images="fdgdfgfdg/img/facebook.jpg"
+                    data-images="cabeza.cn/img/facebook.jpg"
                     data-content="
   今日公司年会，微醺
 
@@ -277,7 +283,7 @@
 在成功登录后，就可以搞一些好玩的事情了
 
 比如知乎没有提供特别关心某用户的功能，我们可以自己做一个，当关注的用户有新的动态时... | Cabeza's blog"
-                    data-url="fdgdfgfdg/blog/2016/01/30/jsoup-learning-note-4/">
+                    data-url="cabeza.cn/blog/2016/01/30/jsoup-learning-note-4/">
                     <div class="ds-share-inline">
                       <ul  class="ds-share-icons-16">
 
@@ -296,7 +302,7 @@
 
                 <!-- 多说评论框 start -->
                 <div class="comment">
-                    <div class="ds-thread" data-thread-key="/blog/2016/01/30/jsoup-learning-note-4" data-title="jsoup学习笔记(四):监控动态与爬取所有动态" data-url="fdgdfgfdg/blog/2016/01/30/jsoup-learning-note-4/"></div>
+                    <div class="ds-thread" data-thread-key="/blog/2016/01/30/jsoup-learning-note-4" data-title="jsoup学习笔记(四):监控动态与爬取所有动态" data-url="cabeza.cn/blog/2016/01/30/jsoup-learning-note-4/"></div>
                 </div>
                 <!-- 多说评论框 end -->
             </div>
