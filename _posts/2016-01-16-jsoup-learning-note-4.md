@@ -119,4 +119,47 @@ tags: [java,jsoup,html]
 	
 ### 爬取所有动态
 
-待更	
+跟上文的监控动态很相似，不同的是需要分析点击“更多”时发送的请求与返回的信息
+
+	请求url
+	Request URL:https://www.zhihu.com/people/excited-vczh/activities
+	Request Method:POST
+	参数
+	Form Date:
+	start:1457128047
+	_xsrf:00662dfea71523ebea00cebcfca083ff
+	
+请求的参数中，start指的是点击“更多”时当前展示的最后一条动态的unix时间戳，该值可以从页面dom元素中获取：
+
+	elmts = doc.select(".zm-profile-section-item.zm-item.clearfix");
+        while(!elmts.isEmpty()){
+            for (Element elmt : elmts) {
+				//...
+                traverseStartSign = elmt.attr("data-time");
+            }
+
+_xsrf在前面文章中提到过，猜测是一种验证机制，用登陆时保存的值即可
+
+	con = Jsoup.connect(url + "/activities").method(Connection.Method.POST).timeout(3000).ignoreContentType(true);//获取连接
+            con.header("User-Agent", userAgent);//配置模拟浏览器
+            con.data("start", traverseStartSign).data("_xsrf", _xsrf);
+
+再来返回的信息：
+	
+	{"r":0,
+	 "msg": [20,"<div class=\"zm-profile-section-item zm-item clearfix\" data-time=\"1457128021\" data-type=\"a\" data-type-detail=\"member_voteup_answer\">\n<span class=\"zm-profile-setion-time zg-gray zg-right\">7 \u5c0f\u65f6\u524d<\/span>\n....后面东西太多，不展示了"]
+	}
+
+可以看到返回的是一个json串，其中msg为时间戳start之后的动态信息，
+
+\uxxxx这种格式是Unicode写法，表示一个字符，例如\u5c0f表示汉语中的‘小’字。
+
+为了解析json串，需要引入json相关的包
+
+	JSONObject jsonObj=JSONObject.fromString(rs.body());
+	doc=Jsoup.parse(jsonObj.getJSONArray("msg").get(1).toString());
+
+得到的doc就是新动态的dom信息，接着像监控动态里分析dom，提取信息即可
+
+分析得到的dom后，继续判断当前展示的最后一条动态的unix时间戳、发送请求、得到返回的dom结构，如是往复，即可遍历所有动态
+

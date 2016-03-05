@@ -5,8 +5,8 @@
     <description></description>
     <link>cabeza.cn/</link>
     <atom:link href="cabeza.cn/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sun, 28 Feb 2016 15:33:20 +0000</pubDate>
-    <lastBuildDate>Sun, 28 Feb 2016 15:33:20 +0000</lastBuildDate>
+    <pubDate>Sat, 05 Mar 2016 05:45:32 +0000</pubDate>
+    <lastBuildDate>Sat, 05 Mar 2016 05:45:32 +0000</lastBuildDate>
     <generator>Jekyll v3.0.1</generator>
     
       <item>
@@ -464,7 +464,60 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
 &lt;h3 id=&quot;section-3&quot;&gt;爬取所有动态&lt;/h3&gt;
 
-&lt;p&gt;待更&lt;/p&gt;
+&lt;p&gt;跟上文的监控动态很相似，不同的是需要分析点击“更多”时发送的请求与返回的信息&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;请求url
+Request URL:https://www.zhihu.com/people/excited-vczh/activities
+Request Method:POST
+参数
+Form Date:
+start:1457128047
+_xsrf:00662dfea71523ebea00cebcfca083ff
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;请求的参数中，start指的是点击“更多”时当前展示的最后一条动态的unix时间戳，该值可以从页面dom元素中获取：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;elmts = doc.select(&quot;.zm-profile-section-item.zm-item.clearfix&quot;);
+    while(!elmts.isEmpty()){
+        for (Element elmt : elmts) {
+			//...
+            traverseStartSign = elmt.attr(&quot;data-time&quot;);
+        }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;_xsrf在前面文章中提到过，猜测是一种验证机制，用登陆时保存的值即可&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;con = Jsoup.connect(url + &quot;/activities&quot;).method(Connection.Method.POST).timeout(3000).ignoreContentType(true);//获取连接
+        con.header(&quot;User-Agent&quot;, userAgent);//配置模拟浏览器
+        con.data(&quot;start&quot;, traverseStartSign).data(&quot;_xsrf&quot;, _xsrf);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;再来返回的信息：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;r&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+ &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;msg&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;div class=\&quot;zm-profile-section-item zm-item clearfix\&quot; data-time=\&quot;1457128021\&quot; data-type=\&quot;a\&quot; data-type-detail=\&quot;member_voteup_answer\&quot;&amp;gt;\n&amp;lt;span class=\&quot;zm-profile-setion-time zg-gray zg-right\&quot;&amp;gt;7 \u5c0f\u65f6\u524d&amp;lt;\/span&amp;gt;\n....后面东西太多，不展示了&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;可以看到返回的是一个json串，其中msg为时间戳start之后的动态信息，&lt;/p&gt;
+
+&lt;p&gt;\uxxxx这种格式是Unicode写法，表示一个字符，例如\u5c0f表示汉语中的‘小’字。&lt;/p&gt;
+
+&lt;p&gt;为了解析json串，需要引入json相关的包&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;JSONObject jsonObj=JSONObject.fromString(rs.body());
+doc=Jsoup.parse(jsonObj.getJSONArray(&quot;msg&quot;).get(1).toString());
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;得到的doc就是新动态的dom信息，接着像监控动态里分析dom，提取信息即可&lt;/p&gt;
+
+&lt;p&gt;分析得到的dom后，继续判断当前展示的最后一条动态的unix时间戳、发送请求、得到返回的dom结构，如是往复，即可遍历所有动态&lt;/p&gt;
+
 </description>
         <pubDate>Sat, 30 Jan 2016 00:00:00 +0000</pubDate>
         <link>cabeza.cn/blog/2016/01/30/jsoup-learning-note-4/</link>
