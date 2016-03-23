@@ -92,6 +92,7 @@ select::-ms-expand {
   height: 17px;
   position: absolute;
   top: 50%;
+  left: 0;
   -webkit-transform: translate3d(0, -50%, 0);
      -moz-transform: translate3d(0, -50%, 0);
           transform: translate3d(0, -50%, 0);
@@ -633,7 +634,7 @@ select::-ms-expand {
 }
 .enroll .enroll-group .input-group {
   float: left;
-  width: 670px;
+  width: 672px;
   margin-left: 75px;
 }
 .enroll .enroll-group .input-group .input-items {
@@ -698,13 +699,11 @@ select::-ms-expand {
   line-height: 18px;
 }
 .contact .contact-inputs {
-  float: left;
-  position: relative;
-  left: 50%;
   margin-top: 30px;
-  -webkit-transform: translate3d(-50%, 0, 0);
-     -moz-transform: translate3d(-50%, 0, 0);
-          transform: translate3d(-50%, 0, 0);
+  margin-left: auto;
+  margin-right: auto;
+  width: 512px;
+  height: 40px;
 }
 .contact .contact-inputs input {
   float: left;
@@ -732,7 +731,11 @@ select::-ms-expand {
 .contact .site-icon-group {
   float: left;
   position: relative;
-  margin-top: 102px;
+  left: 50%;
+  -webkit-transform: translate3d(-50%, 0, 0);
+     -moz-transform: translate3d(-50%, 0, 0);
+          transform: translate3d(-50%, 0, 0);
+  margin-top: 52px;
 }
 .contact .site-icon-group img {
   margin-left: 14px;

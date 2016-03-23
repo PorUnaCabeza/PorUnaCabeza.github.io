@@ -90,6 +90,7 @@ select::-ms-expand {
         height: 17px;
         position: absolute;
         top: 50%;
+        left: 0;
         transform: translate3d(0, -50%, 0);
       }
       .text {
@@ -598,7 +599,7 @@ select::-ms-expand {
     }
     .input-group {
       float: left;
-      width: 670px;
+      width: 672px;
       margin-left: 75px;
       .input-items {
         margin-bottom: 13px;
@@ -665,11 +666,11 @@ select::-ms-expand {
     }
   }
   .contact-inputs {
-    float: left;
-    position: relative;
-    left: 50%;
     margin-top: 30px;
-    transform: translate3d(-50%, 0, 0);
+    margin-left: auto;
+    margin-right: auto;
+    width: 512px;
+    height: 40px;
     input {
       float: left;
       width: 420px;
@@ -697,7 +698,9 @@ select::-ms-expand {
   .site-icon-group {
     float: left;
     position: relative;
-    margin-top: 102px;
+    left: 50%;
+    transform: translate3d(-50%, 0, 0);
+    margin-top: 52px;
     img {
       margin-left: 14px;
       margin-right: 14px;
