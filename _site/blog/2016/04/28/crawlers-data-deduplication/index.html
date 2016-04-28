@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+
+    <title>爬虫数据去重小记 - Namárië</title>
+
+    <link rel="canonical" href="cabeza.cn/blog/2016/04/28/crawlers-data-deduplication/">
+
+    <!-- Icons -->
+  <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+   
+
+</head>
+
+
+
+
+
+
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Namárië</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+                <li>
+                    <a href="/about/">关于我</a>
+                </li>
+                
+                <li>
+                    <a href="/archive/">列表</a>
+                </li>
+                
+                <li>
+                    <a href="/tags/">标签</a>
+                </li>
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+		background-color:#678
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="Tags">
+                        
+                        <a class="tag" style="" href="/tags/#html" title="html">html</a>
+                        
+                        <a class="tag" style="" href="/tags/#java" title="java">java</a>
+                        
+                    </div>
+                    <h1>爬虫数据去重小记</h1>
+                    
+                    <span class="meta">Posted by cabeza on April 28, 2016</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 post-container">
+
+                <blockquote>
+  <p>最近把之前写的知乎爬虫做了些调整，在数据去重这块遇到了点问题</p>
+</blockquote>
+
+<p>写毕设之余将知乎爬虫算是重写了一遍，会依次抓取各用户关注的人信息，数据量呈指数级递增，因为用户的关注是交叉式的，不可避免的会遇到数据去重的问题</p>
+
+<p>到目前为止，我抓取了15.8万条用户信息，1141.3万条用户之间关系信息，我只对这15.8万用户的url进行去重，按道理讲用一个HashSet就可以了，
+无奈阿里云服务器内存是1G的，用HashSet加载后就报<em>CodeCache is full</em>错误，只好再研究别的去重方式喽</p>
+
+<h4 id="section">哈希表</h4>
+
+<p>平常用的最多的就是它，没啥讲的，简单快速准确，缺点是比较废空间，当集合比较小时这个问题不显著，但是当集合巨大时，哈希表存储效率低的问题就显现出来了。</p>
+
+<p>比如说，一个象 Yahoo,Hotmail 和 Gmai 那样的公众电子邮件（email）提供商，总是需要过滤来自发送垃圾邮件的人（spamer）的垃圾邮件。
+一个办法就是记录下那些发垃圾邮件的 email 地址。由于那些发送者不停地在注册新的地址，全世界少说也有几十亿个发垃圾邮件的地址，
+将他们都存起来则需要大量的网络服务器。如果用哈希表，每存储一亿 个 email 地址， 就需要 1.6GB 的内存（用哈希表实现的具体办法是将每一个 email 地址对应成一个八字节的信息指纹）
+然后将这些信息指纹存入哈希表，由于哈希表的存储效率一般只有 50%，因此一个 email 地址需要占用十六个字节。一亿个地址大约要 1.6GB， 即十六亿字节的内存）。
+因此存贮几十亿个邮件地址可能需要上百 GB 的内存。除非是超级计算机，一般服务器是无法存储的。</p>
+
+<h4 id="section-1">布隆过滤器</h4>
+
+<p>它的优点是空间效率和查询时间都远远超过一般的算法，缺点是有一定的误识别率（Bloom Filter报告某一元素存在于某集合中，但是实际上该元素并不在集合中）
+和删除困难，但是没有识别错误的情形（某个元素确实在该集合中，那么Bloom Filter 是不会报告该元素不存在于集合中的，所以不会漏报）。</p>
+
+<p>直接上代码</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public class BloomFilter {
+
+	private static final int DEFAULT_SIZE = 2 &lt;&lt; 24;//比特长度
+	private static final int[] seeds = {3,5,7, 11, 13, 31, 37, 61};
+	private static BitSet bits = new BitSet(DEFAULT_SIZE);
+	private static SimpleHash[] func = new SimpleHash[seeds.length];
+
+	public static void add(String value)
+	{
+		if(value != null){
+			for(SimpleHash f : func)
+				bits.set(f.hash(value),true);
+		}
+	}
+
+	public static boolean contains(String value)
+	{
+		if(value == null) return false;
+		boolean ret = true;
+		for(SimpleHash f : func){
+			if(!bits.get(f.hash(value)))
+				return false;
+		}
+		return true;
+	}
+}
+
+class SimpleHash {
+
+	private int cap;
+	private int seed;
+
+	public  SimpleHash(int cap, int seed) {
+		this.cap = cap;
+		this.seed = seed;
+	}
+
+	public int hash(String value) {
+		int result = 0;
+		int len = value.length();
+		for (int i = 0; i &lt; len; i++) {
+			result = seed * result + value.charAt(i);
+		}
+		return (cap - 1) &amp; result;
+	}
+}
+</code></pre>
+</div>
+
+<p>布隆过滤器需要的是一个位数组（这个和位图有点类似）和k个映射函数（和Hash表类似），在初始状态时，对于长度为m的位数组array，
+它的所有位都被置为0。对于有n个元素的集合S={s1,s2……sn}，通过k个映射函数{f1,f2,……fk}，将集合S中的每个元素sj(1&lt;=j&lt;=n)映射为k个值{g1,g2……gk}，
+然后再将位数组array中相对应的array[g1],array[g2]……array[gk]置为1；如果要查找某个元素item是否在S中，
+则通过映射函数{f1,f2…..fk}得到k个值{g1,g2…..gk}，然后再判断array[g1],array[g2]……array[gk]是否都为1，若全为1，则item在S中，
+否则item不在S中。这个就是布隆过滤器的实现原理。</p>
+
+<h4 id="redis">redis去重</h4>
+
+<p>最近才尝试使用redis（以前项目都是玩具，也用不到），感觉真好用啊，现在新写东西都在想“这个要不要引入redis呢”哈哈</p>
+
+<p>redis去重我是用的set数据格式，简单易懂，最常见，直接把要去重的数据sadd，需要计数就scard</p>
+
+<p>简单的代码：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code> public static boolean put(String value){
+    if(jedis.sismember(FILTER_NAME,value)){
+        return true;//存在
+    }else{
+        jedis.sadd(FILTER_NAME,value);
+        return false;//不存在并添加
+    }
+}
+</code></pre>
+</div>
+
+<p>因为我的爬虫里待爬取列表也是用的redis，这样就太方便后台做一些交集、差集的运算，用起来很爽</p>
+
+<p>当然这是最简单的用法，还有基于zset、redis+lua脚本实现布隆过滤器等更强大的数据去重</p>
+
+<p>可以翻阅  <a href="http://www.csdn.net/article/a/2016-03-16/15836359" target="_blank"><strong>漫谈redis在运维数据分析中的去重统计方式</strong></a></p>
+
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/blog/2016/02/28/datatable-learning-note-1/" data-toggle="tooltip" data-placement="top" title="Datatables学习小记">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+                <!-- Duoshuo Share start -->
+                <style>
+                    .ds-share{
+                        text-align: right;
+                    }
+                    
+                    @media only screen and (max-width: 700px) {
+                        .ds-share {
+
+                        }
+                    }
+                </style>
+
+                <div class="ds-share"
+                    data-thread-key="/blog/2016/04/28/crawlers-data-deduplication" data-title="爬虫数据去重小记"
+                    data-images="cabeza.cn/img/facebook.jpg"
+                    data-content="
+  最近把之前写的知乎爬虫做了些调整，在数据去重这块遇到了点问题
+
+
+写毕设之余将知乎爬虫算是重写了一遍，会依次抓取各用户关注的人信息，数据量呈指数级递... | Cabeza's blog"
+                    data-url="cabeza.cn/blog/2016/04/28/crawlers-data-deduplication/">
+                    <div class="ds-share-inline">
+                      <ul  class="ds-share-icons-16">
+
+                        <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
+                        <li><a class="ds-wechat flat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+                        <li><a class="ds-weibo flat" href="javascript:void(0);" data-service="weibo">微博</a></li>
+                        <li><a class="ds-douban flat" href="javascript:void(0);" data-service="douban">豆瓣</a></li>
+                      </ul>
+                      <div class="ds-share-icons-more">
+                      </div>
+                    </div>
+                <hr>
+                </div>
+                <!-- Duoshuo Share end-->
+
+
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread" data-thread-key="/blog/2016/04/28/crawlers-data-deduplication" data-title="爬虫数据去重小记" data-url="cabeza.cn/blog/2016/04/28/crawlers-data-deduplication/"></div>
+                </div>
+                <!-- 多说评论框 end -->
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"cabeza"};
+    (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+</script>
+<!-- 多说公共JS代码 end -->
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("http://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <!-- kill the Facebook and Weibo -->
+					
+                    
+
+                    
+                    
+                    <!--
+                    
+                    -->
+
+                    <!--
+                    
+                    -->
+
+                    
+                    <!--
+                    
+                    -->
+
+                </ul>
+                <p class="copyright text-muted">
+                &copy; 2016  cabeza ❖ Powered by Jekyll.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+
+<!-- Highlight.js -->
+<script>
+    async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js",function(){
+        hljs.initHighlightingOnLoad();
+    })
+</script>
+<link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+
+
+</body>
+
+</html>
