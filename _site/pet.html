@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title>对战计算</title>
+     <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/underscore-min.js"></script>
+    <style type="text/css">
+        .media-left label {
+            width: 85px;
+        }
+
+    </style>
+    <script>
+        var elementsRestrain=['金木','木土','土水','水火','火金'];
+        var elementsRestrainMultiple=0.3;
+        var raceRestrainMultiple=0.5;
+        var myPets = new Array();
+        var enemyPets=new Array();
+        var max={};
+        max.list=[];
+        max.max=0;
+        $(function () {
+            init();
+            $('.pk').on('click', function () {
+				max.list=[];
+				max.max=-2;
+                getMyPets();
+                getEnemyPets();
+                if(myPets.length<2||enemyPets.length<2){
+                    return alert("两边可用的宠物都要大于二，兄弟");
+                }
+                pk(myPets,enemyPets);
+                var successStr='';
+                _.each(unique(max.list),function(group){
+                    successStr+="["
+                    successStr+=myPets[parseInt(group/10)].name+',';
+                    successStr+=myPets[group%10].name+'],'
+                });
+				if(max.max!=0)
+					alert('推荐阵容'+successStr);
+				else
+					alert('平局，或者失败概率大(期待打脸)');
+            });
+        });
+
+        function getMyPets() {
+            myPets.length=0;
+            var $petInfoList = $('.my .pet-info');
+            _.each($petInfoList, function (petInfo) {
+                var $petInfo = $(petInfo);
+                var name = $petInfo.find('.pet-name').val().trim();
+                if (name == "")
+                    return;
+                var pet = {};
+                pet.name = name;
+                pet.element = $petInfo.find('.pet-element').val();
+                pet.race = $petInfo.find('.pet-race').val();
+                pet.restrain = new Array();
+                _.each($petInfo.find('.pet-restrain'), function (petRestrain) {
+                    var $petRestrain = $(petRestrain);
+                    var restrain = $petRestrain.val();
+                    if (restrain != "无")
+                        pet.restrain.push(restrain);
+                });
+                myPets.push(pet);
+            });
+            localStorage.setItem('myPets', JSON.stringify(myPets));
+            console.log(myPets);
+        }
+        function getEnemyPets(){
+            enemyPets.length=0;
+            var $enemyPetsInfoList= _.filter($('.enemy .pet-info'),function(enemyPetInfo){
+                return $(enemyPetInfo).find('.pet-used').is(':checked');
+            });
+            _.each($enemyPetsInfoList,function(enemyPetInfo){
+                var $enemyPetInfo=$(enemyPetInfo);
+                var pet = {};
+                pet.element = $enemyPetInfo.find('.pet-element').val();
+                pet.race = $enemyPetInfo.find('.pet-race').val();
+                pet.restrain = new Array();
+                _.each($enemyPetInfo.find('.pet-restrain'), function (petRestrain) {
+                    var $petRestrain = $(petRestrain);
+                    var restrain = $petRestrain.val();
+                    if (restrain != "无")
+                        pet.restrain.push(restrain);
+                });
+                enemyPets.push(pet);
+            });
+        }
+        function init() {
+            _.each($('.my .media'),function(media,index){
+                $media=$(media);
+                $media.find('.media-left label').text('宠物'+(index+1));
+                if(index%3==0)
+                    $media.addClass('list-group-item-success');
+                if(index%3==1)
+                    $media.addClass('list-group-item-info');
+                if(index%3==2)
+                    $media.addClass('list-group-item-warning');
+            });
+            _.each($('.enemy .media'),function(media,index){
+                $media=$(media);
+                $media.find('.media-left label').text('敌方宠物'+(index+1));
+                if(index%3==0)
+                    $media.addClass('list-group-item-success');
+                if(index%3==1)
+                    $media.addClass('list-group-item-info');
+                if(index%3==2)
+                    $media.addClass('list-group-item-warning');
+            });
+            var recoveryPets;
+            try {
+                recoveryPets = JSON.parse(localStorage.getItem('myPets'));
+            } catch (e) {
+                console.log('json转换错误，淡定');
+            }
+            if (recoveryPets == null || recoveryPets.length == 0)
+                return;
+            console.log(recoveryPets);
+            _.each(recoveryPets, function (pet, index) {
+                var $petInfo = $('.my .pet-info').eq(index);
+                $petInfo.find('.pet-name').val(pet.name);
+                $petInfo.find('.pet-element').val(pet.element);
+                $petInfo.find('.pet-race').val(pet.race);
+                _.each(pet.restrain, function (restrain, index) {
+                    var $petRestrain = $petInfo.find('.pet-restrain').eq(index);
+                    $petRestrain.val(restrain);
+                });
+            });
+        }
+
+        function Combin(length) {
+            var result = [];
+            if (length == 0)
+                return null;
+            if (length == 1)
+                return null;
+            for (var i = 0; i < length - 1; i++)
+                for (var j = i + 1; j < length; j++) {
+                    result.push(i + "" + j);
+                }
+            return result;
+        }
+        function pk(myPets,enemyPets){
+            var myQueue=Combin(myPets.length);
+            var enemyQueue=Combin(enemyPets.length);
+            for(var i=0;i<myQueue.length;i++){
+				var result=0;
+                for(var j=0;j<enemyQueue.length;j++){
+                    result+=calc(myPets[parseInt(myQueue[i]/10)],enemyPets[parseInt(enemyQueue[j]/10)]);
+                    result+=calc(myPets[myQueue[i]%10],enemyPets[enemyQueue[j]%10]);
+                    result+=calc(myPets[parseInt(myQueue[i]/10)],enemyPets[enemyQueue[j]%10]);
+                    result+=calc(myPets[myQueue[i]%10],enemyPets[parseInt(enemyQueue[j]/10)]);
+                }
+				if(result==max.max){
+					max.list.push(myQueue[i]);
+					console.log(myQueue[i],enemyQueue[j]);
+				} else if(result>max.max){
+					console.log(myQueue[i],enemyQueue[j]);
+					max.list.length=0;
+					max.list.push(myQueue[i]);
+					max.max=result;
+				}
+            }
+        }
+        function calc(myPet,enemyPet){
+            var result=0;
+            _.contains(elementsRestrain,myPet.element+enemyPet.element)&&(result+=elementsRestrainMultiple);
+            _.contains(myPet.restrain,enemyPet.race)&&(result+=raceRestrainMultiple);
+            _.contains(elementsRestrain,enemyPet.element+myPet.element)&&(result-=elementsRestrainMultiple);
+            _.contains(enemyPet.restrain,myPet.race)&&(result-=raceRestrainMultiple);
+            return result;
+        }
+        function unique(arr) {
+            var result = [], hash = {};
+            for (var i = 0, elem; (elem = arr[i]) != null; i++) {
+                if (!hash[elem]) {
+                    result.push(elem);
+                    hash[elem] = true;
+                }
+            }
+            return result;
+        }
+    </script>
+</head>
+<body>
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Namárië</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+                <li>
+                    <a href="/about/">关于我</a>
+                </li>
+                
+                <li>
+                    <a href="/archive/">列表</a>
+                </li>
+                
+                <li>
+                    <a href="/tags/">标签</a>
+                </li>
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<header class="intro-header" style="background-color:#333">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="site-heading" style="padding:30px;">
+                    <h3>对战计算测试版</h3>
+                    <hr class="small">
+                    <span class="subheading">为什么自己测试了几盘输多赢少呢？</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div class="row container">
+    <div class="col-xs-5 my">
+        <div class="list-group">
+            <div class="media pet-info list-group-item">
+            <div class="media-left">
+                <label>宠物1</label>
+                <input type="text" class="form-control pet-name" placeholder="输入名字">
+            </div>
+            <div class="media-body">
+                <div class="media-heading">
+                    <div class="form-inline">
+                        <div class="form-group form-group-sm">
+                            <label>属性：</label>
+                            <select class="form-control pet-element">
+                                <option>金</option>
+                                <option>木</option>
+                                <option>水</option>
+                                <option>火</option>
+                                <option>土</option>
+                            </select>
+                            <select class="form-control pet-race">
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-inline">
+                    <div class="form-group form-group-sm">
+                        <label>克敌：</label>
+                        <select class="form-control pet-restrain">
+                            <option>震野</option>
+                            <option>鸾羽</option>
+                            <option>束地</option>
+                            <option>精灵</option>
+                            <option>擎山</option>
+                            <option>风林</option>
+                            <option>守护</option>
+                            <option>缚地</option>
+                            <option>天锐</option>
+                            <option>元素</option>
+                            <option>恶魔</option>
+                            <option>神威</option>
+                        </select>
+                        <select class="form-control pet-restrain">
+                            <option>无</option>
+                            <option>震野</option>
+                            <option>鸾羽</option>
+                            <option>束地</option>
+                            <option>精灵</option>
+                            <option>擎山</option>
+                            <option>风林</option>
+                            <option>守护</option>
+                            <option>缚地</option>
+                            <option>天锐</option>
+                            <option>元素</option>
+                            <option>恶魔</option>
+                            <option>神威</option>
+                        </select>
+                        <select class="form-control pet-restrain">
+                            <option>无</option>
+                            <option>震野</option>
+                            <option>鸾羽</option>
+                            <option>束地</option>
+                            <option>精灵</option>
+                            <option>擎山</option>
+                            <option>风林</option>
+                            <option>守护</option>
+                            <option>缚地</option>
+                            <option>天锐</option>
+                            <option>元素</option>
+                            <option>恶魔</option>
+                            <option>神威</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <div class="media pet-info list-group-item">
+                <div class="media-left">
+                    <label>宠物1</label>
+                    <input type="text" class="form-control pet-name" placeholder="输入名字">
+                </div>
+                <div class="media-body">
+                    <div class="media-heading">
+                        <div class="form-inline">
+                            <div class="form-group form-group-sm">
+                                <label>属性：</label>
+                                <select class="form-control pet-element">
+                                    <option>金</option>
+                                    <option>木</option>
+                                    <option>水</option>
+                                    <option>火</option>
+                                    <option>土</option>
+                                </select>
+                                <select class="form-control pet-race">
+                                    <option>震野</option>
+                                    <option>鸾羽</option>
+                                    <option>束地</option>
+                                    <option>精灵</option>
+                                    <option>擎山</option>
+                                    <option>风林</option>
+                                    <option>守护</option>
+                                    <option>缚地</option>
+                                    <option>天锐</option>
+                                    <option>元素</option>
+                                    <option>恶魔</option>
+                                    <option>神威</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-inline">
+                        <div class="form-group form-group-sm">
+                            <label>克敌：</label>
+                            <select class="form-control pet-restrain">
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="media pet-info list-group-item">
+                <div class="media-left">
+                    <label>宠物1</label>
+                    <input type="text" class="form-control pet-name" placeholder="输入名字">
+                </div>
+                <div class="media-body">
+                    <div class="media-heading">
+                        <div class="form-inline">
+                            <div class="form-group form-group-sm">
+                                <label>属性：</label>
+                                <select class="form-control pet-element">
+                                    <option>金</option>
+                                    <option>木</option>
+                                    <option>水</option>
+                                    <option>火</option>
+                                    <option>土</option>
+                                </select>
+                                <select class="form-control pet-race">
+                                    <option>震野</option>
+                                    <option>鸾羽</option>
+                                    <option>束地</option>
+                                    <option>精灵</option>
+                                    <option>擎山</option>
+                                    <option>风林</option>
+                                    <option>守护</option>
+                                    <option>缚地</option>
+                                    <option>天锐</option>
+                                    <option>元素</option>
+                                    <option>恶魔</option>
+                                    <option>神威</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-inline">
+                        <div class="form-group form-group-sm">
+                            <label>克敌：</label>
+                            <select class="form-control pet-restrain">
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="media pet-info list-group-item">
+                <div class="media-left">
+                    <label>宠物1</label>
+                    <input type="text" class="form-control pet-name" placeholder="输入名字">
+                </div>
+                <div class="media-body">
+                    <div class="media-heading">
+                        <div class="form-inline">
+                            <div class="form-group form-group-sm">
+                                <label>属性：</label>
+                                <select class="form-control pet-element">
+                                    <option>金</option>
+                                    <option>木</option>
+                                    <option>水</option>
+                                    <option>火</option>
+                                    <option>土</option>
+                                </select>
+                                <select class="form-control pet-race">
+                                    <option>震野</option>
+                                    <option>鸾羽</option>
+                                    <option>束地</option>
+                                    <option>精灵</option>
+                                    <option>擎山</option>
+                                    <option>风林</option>
+                                    <option>守护</option>
+                                    <option>缚地</option>
+                                    <option>天锐</option>
+                                    <option>元素</option>
+                                    <option>恶魔</option>
+                                    <option>神威</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-inline">
+                        <div class="form-group form-group-sm">
+                            <label>克敌：</label>
+                            <select class="form-control pet-restrain">
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="media pet-info list-group-item">
+                <div class="media-left">
+                    <label>宠物1</label>
+                    <input type="text" class="form-control pet-name" placeholder="输入名字">
+                </div>
+                <div class="media-body">
+                    <div class="media-heading">
+                        <div class="form-inline">
+                            <div class="form-group form-group-sm">
+                                <label>属性：</label>
+                                <select class="form-control pet-element">
+                                    <option>金</option>
+                                    <option>木</option>
+                                    <option>水</option>
+                                    <option>火</option>
+                                    <option>土</option>
+                                </select>
+                                <select class="form-control pet-race">
+                                    <option>震野</option>
+                                    <option>鸾羽</option>
+                                    <option>束地</option>
+                                    <option>精灵</option>
+                                    <option>擎山</option>
+                                    <option>风林</option>
+                                    <option>守护</option>
+                                    <option>缚地</option>
+                                    <option>天锐</option>
+                                    <option>元素</option>
+                                    <option>恶魔</option>
+                                    <option>神威</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-inline">
+                        <div class="form-group form-group-sm">
+                            <label>克敌：</label>
+                            <select class="form-control pet-restrain">
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="media pet-info list-group-item">
+                <div class="media-left">
+                    <label>宠物1</label>
+                    <input type="text" class="form-control pet-name" placeholder="输入名字">
+                </div>
+                <div class="media-body">
+                    <div class="media-heading">
+                        <div class="form-inline">
+                            <div class="form-group form-group-sm">
+                                <label>属性：</label>
+                                <select class="form-control pet-element">
+                                    <option>金</option>
+                                    <option>木</option>
+                                    <option>水</option>
+                                    <option>火</option>
+                                    <option>土</option>
+                                </select>
+                                <select class="form-control pet-race">
+                                    <option>震野</option>
+                                    <option>鸾羽</option>
+                                    <option>束地</option>
+                                    <option>精灵</option>
+                                    <option>擎山</option>
+                                    <option>风林</option>
+                                    <option>守护</option>
+                                    <option>缚地</option>
+                                    <option>天锐</option>
+                                    <option>元素</option>
+                                    <option>恶魔</option>
+                                    <option>神威</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-inline">
+                        <div class="form-group form-group-sm">
+                            <label>克敌：</label>
+                            <select class="form-control pet-restrain">
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="media pet-info list-group-item">
+                <div class="media-left">
+                    <label>宠物1</label>
+                    <input type="text" class="form-control pet-name" placeholder="输入名字">
+                </div>
+                <div class="media-body">
+                    <div class="media-heading">
+                        <div class="form-inline">
+                            <div class="form-group form-group-sm">
+                                <label>属性：</label>
+                                <select class="form-control pet-element">
+                                    <option>金</option>
+                                    <option>木</option>
+                                    <option>水</option>
+                                    <option>火</option>
+                                    <option>土</option>
+                                </select>
+                                <select class="form-control pet-race">
+                                    <option>震野</option>
+                                    <option>鸾羽</option>
+                                    <option>束地</option>
+                                    <option>精灵</option>
+                                    <option>擎山</option>
+                                    <option>风林</option>
+                                    <option>守护</option>
+                                    <option>缚地</option>
+                                    <option>天锐</option>
+                                    <option>元素</option>
+                                    <option>恶魔</option>
+                                    <option>神威</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-inline">
+                        <div class="form-group form-group-sm">
+                            <label>克敌：</label>
+                            <select class="form-control pet-restrain">
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="media pet-info list-group-item">
+                <div class="media-left">
+                    <label>宠物1</label>
+                    <input type="text" class="form-control pet-name" placeholder="输入名字">
+                </div>
+                <div class="media-body">
+                    <div class="media-heading">
+                        <div class="form-inline">
+                            <div class="form-group form-group-sm">
+                                <label>属性：</label>
+                                <select class="form-control pet-element">
+                                    <option>金</option>
+                                    <option>木</option>
+                                    <option>水</option>
+                                    <option>火</option>
+                                    <option>土</option>
+                                </select>
+                                <select class="form-control pet-race">
+                                    <option>震野</option>
+                                    <option>鸾羽</option>
+                                    <option>束地</option>
+                                    <option>精灵</option>
+                                    <option>擎山</option>
+                                    <option>风林</option>
+                                    <option>守护</option>
+                                    <option>缚地</option>
+                                    <option>天锐</option>
+                                    <option>元素</option>
+                                    <option>恶魔</option>
+                                    <option>神威</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-inline">
+                        <div class="form-group form-group-sm">
+                            <label>克敌：</label>
+                            <select class="form-control pet-restrain">
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="media pet-info list-group-item">
+                <div class="media-left">
+                    <label>宠物1</label>
+                    <input type="text" class="form-control pet-name" placeholder="输入名字">
+                </div>
+                <div class="media-body">
+                    <div class="media-heading">
+                        <div class="form-inline">
+                            <div class="form-group form-group-sm">
+                                <label>属性：</label>
+                                <select class="form-control pet-element">
+                                    <option>金</option>
+                                    <option>木</option>
+                                    <option>水</option>
+                                    <option>火</option>
+                                    <option>土</option>
+                                </select>
+                                <select class="form-control pet-race">
+                                    <option>震野</option>
+                                    <option>鸾羽</option>
+                                    <option>束地</option>
+                                    <option>精灵</option>
+                                    <option>擎山</option>
+                                    <option>风林</option>
+                                    <option>守护</option>
+                                    <option>缚地</option>
+                                    <option>天锐</option>
+                                    <option>元素</option>
+                                    <option>恶魔</option>
+                                    <option>神威</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-inline">
+                        <div class="form-group form-group-sm">
+                            <label>克敌：</label>
+                            <select class="form-control pet-restrain">
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-1">
+        <br>
+        <button class="btn btn-primary pk">test</button>
+    </div>
+    <div class="col-xs-5 enemy">
+        <div class="list-group">
+            <div class="media pet-info list-group-item">
+                <div class="media-left">
+                    <label>宠物1</label>
+                    <input type="checkbox" class="pet-used"  checked="true">
+                    启用
+                </div>
+                <div class="media-body">
+                    <div class="media-heading">
+                        <div class="form-inline">
+                            <div class="form-group form-group-sm">
+                                <label>属性：</label>
+                                <select class="form-control pet-element">
+                                    <option>金</option>
+                                    <option>木</option>
+                                    <option>水</option>
+                                    <option>火</option>
+                                    <option>土</option>
+                                </select>
+                                <select class="form-control pet-race">
+                                    <option>震野</option>
+                                    <option>鸾羽</option>
+                                    <option>束地</option>
+                                    <option>精灵</option>
+                                    <option>擎山</option>
+                                    <option>风林</option>
+                                    <option>守护</option>
+                                    <option>缚地</option>
+                                    <option>天锐</option>
+                                    <option>元素</option>
+                                    <option>恶魔</option>
+                                    <option>神威</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-inline">
+                        <div class="form-group form-group-sm">
+                            <label>克敌：</label>
+                            <select class="form-control pet-restrain">
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="media pet-info list-group-item">
+                <div class="media-left">
+                    <label>宠物1</label>
+                    <input type="checkbox" class="pet-used"  checked="true">
+                    启用
+                </div>
+                <div class="media-body">
+                    <div class="media-heading">
+                        <div class="form-inline">
+                            <div class="form-group form-group-sm">
+                                <label>属性：</label>
+                                <select class="form-control pet-element">
+                                    <option>金</option>
+                                    <option>木</option>
+                                    <option>水</option>
+                                    <option>火</option>
+                                    <option>土</option>
+                                </select>
+                                <select class="form-control pet-race">
+                                    <option>震野</option>
+                                    <option>鸾羽</option>
+                                    <option>束地</option>
+                                    <option>精灵</option>
+                                    <option>擎山</option>
+                                    <option>风林</option>
+                                    <option>守护</option>
+                                    <option>缚地</option>
+                                    <option>天锐</option>
+                                    <option>元素</option>
+                                    <option>恶魔</option>
+                                    <option>神威</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-inline">
+                        <div class="form-group form-group-sm">
+                            <label>克敌：</label>
+                            <select class="form-control pet-restrain">
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="media pet-info list-group-item">
+                <div class="media-left">
+                    <label>宠物1</label>
+                    <input type="checkbox" class="pet-used"  checked="true">
+                    启用
+                </div>
+                <div class="media-body">
+                    <div class="media-heading">
+                        <div class="form-inline">
+                            <div class="form-group form-group-sm">
+                                <label>属性：</label>
+                                <select class="form-control pet-element">
+                                    <option>金</option>
+                                    <option>木</option>
+                                    <option>水</option>
+                                    <option>火</option>
+                                    <option>土</option>
+                                </select>
+                                <select class="form-control pet-race">
+                                    <option>震野</option>
+                                    <option>鸾羽</option>
+                                    <option>束地</option>
+                                    <option>精灵</option>
+                                    <option>擎山</option>
+                                    <option>风林</option>
+                                    <option>守护</option>
+                                    <option>缚地</option>
+                                    <option>天锐</option>
+                                    <option>元素</option>
+                                    <option>恶魔</option>
+                                    <option>神威</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-inline">
+                        <div class="form-group form-group-sm">
+                            <label>克敌：</label>
+                            <select class="form-control pet-restrain">
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="media pet-info list-group-item">
+                <div class="media-left">
+                    <label>宠物1</label>
+                    <input type="checkbox" class="pet-used"  checked="true">
+                    启用
+                </div>
+                <div class="media-body">
+                    <div class="media-heading">
+                        <div class="form-inline">
+                            <div class="form-group form-group-sm">
+                                <label>属性：</label>
+                                <select class="form-control pet-element">
+                                    <option>金</option>
+                                    <option>木</option>
+                                    <option>水</option>
+                                    <option>火</option>
+                                    <option>土</option>
+                                </select>
+                                <select class="form-control pet-race">
+                                    <option>震野</option>
+                                    <option>鸾羽</option>
+                                    <option>束地</option>
+                                    <option>精灵</option>
+                                    <option>擎山</option>
+                                    <option>风林</option>
+                                    <option>守护</option>
+                                    <option>缚地</option>
+                                    <option>天锐</option>
+                                    <option>元素</option>
+                                    <option>恶魔</option>
+                                    <option>神威</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-inline">
+                        <div class="form-group form-group-sm">
+                            <label>克敌：</label>
+                            <select class="form-control pet-restrain">
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="media pet-info list-group-item">
+                <div class="media-left">
+                    <label>宠物1</label>
+                    <input type="checkbox" class="pet-used"  checked="true">
+                    启用
+                </div>
+                <div class="media-body">
+                    <div class="media-heading">
+                        <div class="form-inline">
+                            <div class="form-group form-group-sm">
+                                <label>属性：</label>
+                                <select class="form-control pet-element">
+                                    <option>金</option>
+                                    <option>木</option>
+                                    <option>水</option>
+                                    <option>火</option>
+                                    <option>土</option>
+                                </select>
+                                <select class="form-control pet-race">
+                                    <option>震野</option>
+                                    <option>鸾羽</option>
+                                    <option>束地</option>
+                                    <option>精灵</option>
+                                    <option>擎山</option>
+                                    <option>风林</option>
+                                    <option>守护</option>
+                                    <option>缚地</option>
+                                    <option>天锐</option>
+                                    <option>元素</option>
+                                    <option>恶魔</option>
+                                    <option>神威</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-inline">
+                        <div class="form-group form-group-sm">
+                            <label>克敌：</label>
+                            <select class="form-control pet-restrain">
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                            <select class="form-control pet-restrain">
+                                <option>无</option>
+                                <option>震野</option>
+                                <option>鸾羽</option>
+                                <option>束地</option>
+                                <option>精灵</option>
+                                <option>擎山</option>
+                                <option>风林</option>
+                                <option>守护</option>
+                                <option>缚地</option>
+                                <option>天锐</option>
+                                <option>元素</option>
+                                <option>恶魔</option>
+                                <option>神威</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row container">
+	<div class="alert alert-success" role="alert">
+        穷举计算，最终发现还是靠运气啊
+    </div>
+    <!-- 多说评论框 start -->
+    <div class="comment">
+        <div class="ds-thread" data-thread-key="/pet" data-title="对战计算测试"
+             data-url="cabeza.cn/pet.html"></div>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript">
+    var duoshuoQuery = {short_name: "cabeza"};
+    (function () {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';
+        ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+        || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+</script>
+</html>
