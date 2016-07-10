@@ -8,9 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
 
-    <title>爬虫数据去重小记 - Namárië</title>
+    <title>自己搭建服务器造梯子的小记 - Namárië</title>
 
-    <link rel="canonical" href="cabeza.cn/blog/2016/04/28/crawlers-data-deduplication/">
+    <link rel="canonical" href="cabeza.cn/blog/2016/07/10/digital-ocean-vps-establish/">
 
     <!-- Icons -->
   <link rel="shortcut icon" href="/img/favicon.ico">
@@ -91,14 +91,12 @@
                 <div class="post-heading">
                     <div class="Tags">
                         
-                        <a class="tag" style="" href="/tags/#html" title="html">html</a>
-                        
-                        <a class="tag" style="" href="/tags/#java" title="java">java</a>
+                        <a class="tag" style="" href="/tags/#vps" title="vps">vps</a>
                         
                     </div>
-                    <h1>爬虫数据去重小记</h1>
+                    <h1>自己搭建服务器造梯子的小记</h1>
                     
-                    <span class="meta">Posted by cabeza on April 28, 2016</span>
+                    <span class="meta">Posted by cabeza on July 10, 2016</span>
                 </div>
             </div>
         </div>
@@ -115,111 +113,116 @@
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 post-container">
 
                 <blockquote>
-  <p>最近把之前写的知乎爬虫做了些调整，在数据去重这块遇到了点问题</p>
+  <p>在学校时曾申请过github education pack，前段时间收到成功的邮件，仔细看了下，学生礼包里包含DigitalOcean的50刀代金券，拿来搞个VPS装上shadowsocks是极好的</p>
 </blockquote>
 
-<p>写毕设之余将知乎爬虫算是重写了一遍，会依次抓取各用户关注的人信息，数据量呈指数级递增，因为用户的关注是交叉式的，不可避免的会遇到数据去重的问题</p>
+<h4 id="github-education">Github education</h4>
 
-<p>到目前为止，我抓取了15.8万条用户信息，1141.3万条用户之间关系信息，我只对这15.8万用户的url进行去重，按道理讲用一个HashSet就可以了，
-无奈阿里云服务器内存是1G的，用HashSet加载后就报<em>CodeCache is full</em>错误，只好再研究别的去重方式喽</p>
+<p>在填写一些个人信息、申请理由，上传学生证明（如学生证）后，将会得到一个Student Developer大礼包，其中包括aws、digitalocean等的代金券</p>
 
-<h4 id="section">哈希表</h4>
+<h4 id="digital-ocean">Digital Ocean</h4>
 
-<p>平常用的最多的就是它，没啥讲的，简单快速准确，缺点是比较废空间，当集合比较小时这个问题不显著，但是当集合巨大时，哈希表存储效率低的问题就显现出来了。</p>
+<p>注册账号并登录后，切换到billing界面，在此处即可使用学生礼包里提供的DigitalOcean 50美刀代金券，需要注意的是，需要绑定信用卡或者先向账户里充值5美刀
+才可以激活账号，我是选择使用Paypal充了5美刀。</p>
 
-<p>比如说，一个象 Yahoo,Hotmail 和 Gmai 那样的公众电子邮件（email）提供商，总是需要过滤来自发送垃圾邮件的人（spamer）的垃圾邮件。
-一个办法就是记录下那些发垃圾邮件的 email 地址。由于那些发送者不停地在注册新的地址，全世界少说也有几十亿个发垃圾邮件的地址，
-将他们都存起来则需要大量的网络服务器。如果用哈希表，每存储一亿 个 email 地址， 就需要 1.6GB 的内存（用哈希表实现的具体办法是将每一个 email 地址对应成一个八字节的信息指纹）
-然后将这些信息指纹存入哈希表，由于哈希表的存储效率一般只有 50%，因此一个 email 地址需要占用十六个字节。一亿个地址大约要 1.6GB， 即十六亿字节的内存）。
-因此存贮几十亿个邮件地址可能需要上百 GB 的内存。除非是超级计算机，一般服务器是无法存储的。</p>
+<p>激活后，使用代金券，账户内余额变成了55美刀，搭建5美刀的vps话，够用11个月了</p>
 
-<h4 id="section-1">布隆过滤器</h4>
+<p>在创建vps时选择5$/month的那款，机房建议选择旧金山或者纽约，系统的话建议选择Centos（6版本），为之后的安装加速工具提供方便</p>
 
-<p>它的优点是空间效率和查询时间都远远超过一般的算法，缺点是有一定的误识别率（Bloom Filter报告某一元素存在于某集合中，但是实际上该元素并不在集合中）
-和删除困难，但是没有识别错误的情形（某个元素确实在该集合中，那么Bloom Filter 是不会报告该元素不存在于集合中的，所以不会漏报）。</p>
+<h4 id="shadowsocks">Shadowsocks</h4>
 
-<p>直接上代码</p>
+<p>远程登陆上主机后，便可以进行配置了
+(需要一定linux基础)</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>public class BloomFilter {
+<h5 id="section">安装</h5>
 
-	private static final int DEFAULT_SIZE = 2 &lt;&lt; 24;//比特长度
-	private static final int[] seeds = {3,5,7, 11, 13, 31, 37, 61};
-	private static BitSet bits = new BitSet(DEFAULT_SIZE);
-	private static SimpleHash[] func = new SimpleHash[seeds.length];
+<p>Debian / Ubuntu:</p>
 
-	public static void add(String value)
-	{
-		if(value != null){
-			for(SimpleHash f : func)
-				bits.set(f.hash(value),true);
-		}
-	}
-
-	public static boolean contains(String value)
-	{
-		if(value == null) return false;
-		boolean ret = true;
-		for(SimpleHash f : func){
-			if(!bits.get(f.hash(value)))
-				return false;
-		}
-		return true;
-	}
-}
-
-class SimpleHash {
-
-	private int cap;
-	private int seed;
-
-	public  SimpleHash(int cap, int seed) {
-		this.cap = cap;
-		this.seed = seed;
-	}
-
-	public int hash(String value) {
-		int result = 0;
-		int len = value.length();
-		for (int i = 0; i &lt; len; i++) {
-			result = seed * result + value.charAt(i);
-		}
-		return (cap - 1) &amp; result;
-	}
-}
+<div class="highlighter-rouge"><pre class="highlight"><code>apt-get install python-pip
+pip install shadowsocks
 </code></pre>
 </div>
 
-<p>布隆过滤器需要的是一个位数组（这个和位图有点类似）和k个映射函数（和Hash表类似），在初始状态时，对于长度为m的位数组array，
-它的所有位都被置为0。对于有n个元素的集合S={s1,s2……sn}，通过k个映射函数{f1,f2,……fk}，将集合S中的每个元素sj(1&lt;=j&lt;=n)映射为k个值{g1,g2……gk}，
-然后再将位数组array中相对应的array[g1],array[g2]……array[gk]置为1；如果要查找某个元素item是否在S中，
-则通过映射函数{f1,f2…..fk}得到k个值{g1,g2…..gk}，然后再判断array[g1],array[g2]……array[gk]是否都为1，若全为1，则item在S中，
-否则item不在S中。这个就是布隆过滤器的实现原理。</p>
+<p>CentOS:</p>
 
-<h4 id="redis">redis去重</h4>
-
-<p>最近才尝试使用redis（以前项目都是玩具，也用不到），感觉真好用啊，现在新写东西都在想“这个要不要引入redis呢”哈哈</p>
-
-<p>redis去重我是用的set数据格式，简单易懂，最常见，直接把要去重的数据sadd，需要计数就scard</p>
-
-<p>简单的代码：</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code> public static boolean put(String value){
-    if(jedis.sismember(FILTER_NAME,value)){
-        return true;//存在
-    }else{
-        jedis.sadd(FILTER_NAME,value);
-        return false;//不存在并添加
-    }
-}
+<div class="highlighter-rouge"><pre class="highlight"><code>yum install python-setuptools &amp;&amp; easy_install pip
+pip install shadowsocks
 </code></pre>
 </div>
 
-<p>因为我的爬虫里待爬取列表也是用的redis，这样就太方便后台做一些交集、差集的运算，用起来很爽</p>
+<h5 id="section-1">配置</h5>
 
-<p>当然这是最简单的用法，还有基于zset、redis+lua脚本实现布隆过滤器等更强大的数据去重</p>
+<p>新建一个json文件，如/etc/shadowsocks.json</p>
 
-<p>可以翻阅  <a href="http://www.csdn.net/article/a/2016-03-16/15836359" target="_blank"><strong>漫谈redis在运维数据分析中的去重统计方式</strong></a></p>
+<p>内容为：</p>
 
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
+	</span><span class="nt">"server"</span><span class="p">:</span><span class="s2">"你的服务器ip地址"</span><span class="p">,</span><span class="w">
+	</span><span class="nt">"server_port"</span><span class="p">:</span><span class="mi">8388</span><span class="p">,</span><span class="w">
+	</span><span class="nt">"local_address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"127.0.0.1"</span><span class="p">,</span><span class="w">
+	</span><span class="nt">"local_port"</span><span class="p">:</span><span class="mi">1080</span><span class="p">,</span><span class="w">
+	</span><span class="nt">"password"</span><span class="p">:</span><span class="s2">"你设置的密码"</span><span class="p">,</span><span class="w">
+	</span><span class="nt">"timeout"</span><span class="p">:</span><span class="mi">300</span><span class="p">,</span><span class="w">
+	</span><span class="nt">"method"</span><span class="p">:</span><span class="s2">"aes-256-cfb"</span><span class="p">,</span><span class="w">
+	</span><span class="nt">"fast_open"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+</div>
+
+<h5 id="section-2">启动</h5>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>ssserver -c /etc/shadowsocks.json
+#或者在后台运行
+ssserver -c /etc/shadowsocks.json -d start
+ssserver -c /etc/shadowsocks.json -d stop
+</code></pre>
+</div>
+
+<h4 id="section-3">锐速</h4>
+
+<p>我的服务器是选择在旧金山，在没装加速软件的情况下，看youtube480p卡顿，经测试网速在100k左右，实在不能忍。</p>
+
+<p>不同于finalspeed，锐速是一款单边加速工具，具体细节可以google</p>
+
+<h5 id="section-4">安装</h5>
+
+<p><strong>以下背景均是Centos6，ubuntu自行google</strong></p>
+
+<p>1、更换内核版本</p>
+
+<p>在DigitalOcean后台，将内核更换为2.6.32-504.3.3.el6.x86_64</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>如果不是DigitalOcean的服务器，使用
+rpm -ivh http://soft.91yun.org/ISO/Linux/CentOS/kernel/kernel-firmware-2.6.32-504.3.3.el6.noarch.rpm
+rpm -ivh http://soft.91yun.org/ISO/Linux/CentOS/kernel/kernel-2.6.32-504.3.3.el6.x86_64.rpm --force
+来更换，重启，执行uname -r命令查看结果
+</code></pre>
+</div>
+
+<p>2、安装锐速破解版</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>wget -N --no-check-certificate https://raw.githubusercontent.com/91yun/serverspeeder/master/serverspeeder-all.sh &amp;&amp; bash serverspeeder-all.sh
+</code></pre>
+</div>
+
+<p>卸载方法：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>chattr -i /serverspeeder/etc/apx* &amp;&amp; /serverspeeder/bin/serverSpeeder.sh uninstall -f
+</code></pre>
+</div>
+
+<p>至此，基本结束</p>
+
+<h4 id="section-5">一些常用命令</h4>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>#查看锐速状态
+/serverspeeder/bin/serverSpeeder.sh status
+#查看当前使用本机shadosocks服务的ip
+netstat -an | grep 8388（你的端口） | grep ESTABLISHED
+</code></pre>
+</div>
+
+<p><strong>粗略的做了下记录，以后有空再补充</strong></p>
 
 
                 <hr>
@@ -227,13 +230,9 @@ class SimpleHash {
                 <ul class="pager">
                     
                     <li class="previous">
-                        <a href="/blog/2016/02/28/datatable-learning-note-1/" data-toggle="tooltip" data-placement="top" title="Datatables学习小记">&larr; Previous Post</a>
+                        <a href="/blog/2016/04/28/crawlers-data-deduplication/" data-toggle="tooltip" data-placement="top" title="爬虫数据去重小记">&larr; Previous Post</a>
                     </li>
                     
-                    
-                    <li class="next">
-                        <a href="/blog/2016/07/10/digital-ocean-vps-establish/" data-toggle="tooltip" data-placement="top" title="自己搭建服务器造梯子的小记">Next Post &rarr;</a>
-                    </li>
                     
                 </ul>
 
@@ -251,14 +250,11 @@ class SimpleHash {
                 </style>
 
                 <div class="ds-share"
-                    data-thread-key="/blog/2016/04/28/crawlers-data-deduplication" data-title="爬虫数据去重小记"
+                    data-thread-key="/blog/2016/07/10/digital-ocean-vps-establish" data-title="自己搭建服务器造梯子的小记"
                     data-images="cabeza.cn/img/facebook.jpg"
                     data-content="
-  最近把之前写的知乎爬虫做了些调整，在数据去重这块遇到了点问题
-
-
-写毕设之余将知乎爬虫算是重写了一遍，会依次抓取各用户关注的人信息，数据量呈指数级递... | Cabeza's blog"
-                    data-url="cabeza.cn/blog/2016/04/28/crawlers-data-deduplication/">
+  在学校时曾申请过github education pack，前段时间收到成功的邮件，仔细看了下，学生礼包里包含DigitalOcean的50刀代金券... | Cabeza's blog"
+                    data-url="cabeza.cn/blog/2016/07/10/digital-ocean-vps-establish/">
                     <div class="ds-share-inline">
                       <ul  class="ds-share-icons-16">
 
@@ -277,7 +273,7 @@ class SimpleHash {
 
                 <!-- 多说评论框 start -->
                 <div class="comment">
-                    <div class="ds-thread" data-thread-key="/blog/2016/04/28/crawlers-data-deduplication" data-title="爬虫数据去重小记" data-url="cabeza.cn/blog/2016/04/28/crawlers-data-deduplication/"></div>
+                    <div class="ds-thread" data-thread-key="/blog/2016/07/10/digital-ocean-vps-establish" data-title="自己搭建服务器造梯子的小记" data-url="cabeza.cn/blog/2016/07/10/digital-ocean-vps-establish/"></div>
                 </div>
                 <!-- 多说评论框 end -->
             </div>
