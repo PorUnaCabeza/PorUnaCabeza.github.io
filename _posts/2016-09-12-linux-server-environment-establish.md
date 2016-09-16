@@ -65,7 +65,7 @@ tags: [linux]
 
 来进行检查是否成功
 	
-##### tomcat
+#### tomcat
 
 下载、解压，执行bin目录下的startup.sh和shutdown.sh来进行开启关闭，没啥讲的
 
@@ -90,7 +90,7 @@ tomcat启动后，卡在了
 	
 按文档更改后，搞定
 
-##### git
+#### git
 
 生成ssh密钥
 
@@ -102,7 +102,7 @@ tomcat启动后，卡在了
 	
 复制粘贴到相应git服务器的SSH Keys列表中
 	
-##### jenkins
+#### jenkins
 
 搭建一个jenkins，以后的发布代码会很省事
 
@@ -128,7 +128,7 @@ tomcat启动后，卡在了
 	
 我是将jenkins单独放在一台服务器上，发布的项目在另一台服务器上，需要先建立远程互信，有时间写写。
 	
-##### 一些小工具
+#### 一些小工具
 
 * screen
 
