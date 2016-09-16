@@ -5,9 +5,192 @@
     <description></description>
     <link>cabeza.cn/</link>
     <atom:link href="cabeza.cn/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sun, 10 Jul 2016 13:10:25 +0000</pubDate>
-    <lastBuildDate>Sun, 10 Jul 2016 13:10:25 +0000</lastBuildDate>
+    <pubDate>Fri, 16 Sep 2016 09:25:34 +0000</pubDate>
+    <lastBuildDate>Fri, 16 Sep 2016 09:25:34 +0000</lastBuildDate>
     <generator>Jekyll v3.0.1</generator>
+    
+      <item>
+        <title>linux环境搭建的一些记录</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;最近搞到了两台腾讯云学生特惠主机，将搭建服务器环境的过程做一些记录(均是Ubuntu12.04)&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h4 id=&quot;mysql&quot;&gt;mysql&lt;/h4&gt;
+
+&lt;p&gt;直接使用apt-get来进行安装&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apt-get install mysql-server
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;设置好密码后便可以使用&lt;/p&gt;
+
+&lt;h4 id=&quot;nginx&quot;&gt;Nginx&lt;/h4&gt;
+
+&lt;p&gt;访问&lt;a href=&quot;http://nginx.org/&quot;&gt;nginx官网&lt;/a&gt;挑选合适的版本载到服务器&lt;/p&gt;
+
+&lt;p&gt;解压后cd到解压目录内配置安装路径，如&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;./configure --prefix=/home/ubuntu/tools/nginx
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这时候很大几率会提示缺少一些库，按照提示安装即可，如我需要安装&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apt-get install libpcre3 libpcre3-dev
+apt-get install zlib1g-dev
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;安装必要的库后，便可以进行make了&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;make
+make install
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;安装后，nginx的启动文件在 nginx/sbin下，启动和停止等命令如下&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#启动
+./nginx
+#重载配置文件
+./nginx -s reload
+#停止
+./nginx -s stop
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;jdkmaven&quot;&gt;jdk、maven&lt;/h4&gt;
+
+&lt;p&gt;到&lt;a href=&quot;http://www.oracle.com/technetwork/java/javase/downloads/index.html&quot;&gt;oracle官网&lt;/a&gt;和&lt;a href=&quot;http://maven.apache.org/&quot;&gt;maven官网&lt;/a&gt;
+下载合适的版本，解压。&lt;/p&gt;
+
+&lt;p&gt;环境变量的配置举个例子&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;export JAVA_HOME=/home/ubuntu/tools/jdk1.8.0_101
+export JRE_HOME=$JAVA_HOME/jre
+export CLASSPATH=.:$JAVA_HOME/lib:$JRE_HOME/lib:$CLASSPATH
+export M2_HOME=/home/ubuntu/tools/apache-maven-3.3.9
+export PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$JAVA_HOME:$M2_HOME/bin:$PATH
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;配置完后使用&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;java -version
+mvn -version
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;来进行检查是否成功&lt;/p&gt;
+
+&lt;h5 id=&quot;tomcat&quot;&gt;tomcat&lt;/h5&gt;
+
+&lt;p&gt;下载、解压，执行bin目录下的startup.sh和shutdown.sh来进行开启关闭，没啥讲的&lt;/p&gt;
+
+&lt;p&gt;我本来也是这么认为，直到遇到一个坑….&lt;/p&gt;
+
+&lt;p&gt;tomcat启动后，卡在了&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;INFO: Deploying web application directory
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;在查阅资料后，发现oracle的这一篇文档 :&lt;a href=&quot;http://docs.oracle.com/cd/E13209_01/wlcp/wlss30/configwlss/jvmrand.html&quot;&gt;Avoiding JVM Delays Caused by Random Number Generation&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;里面提到&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;1. Open the $JAVA_HOME/jre/lib/security/java.security file in a text editor.
+
+2. Change the line:
+	securerandom.source=file:/dev/random
+	to read:
+	securerandom.source=file:/dev/urandom
+	
+3. Save your change and exit the text editor.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;按文档更改后，搞定&lt;/p&gt;
+
+&lt;h5 id=&quot;git&quot;&gt;git&lt;/h5&gt;
+
+&lt;p&gt;生成ssh密钥&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ssh-keygen -t rsa -C &quot;你的注册邮箱&quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;一路回车&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vim ~/.ssh/id_rsa.pub
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;复制粘贴到相应git服务器的SSH Keys列表中&lt;/p&gt;
+
+&lt;h5 id=&quot;jenkins&quot;&gt;jenkins&lt;/h5&gt;
+
+&lt;p&gt;搭建一个jenkins，以后的发布代码会很省事&lt;/p&gt;
+
+&lt;p&gt;下载jenkins的war包后，使用命令&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;java -jar jenkins.war --httpPort=端口号 &amp;amp;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;启动，其中&amp;amp;是后台执行的意思&lt;/p&gt;
+
+&lt;p&gt;第一次运行，会安装一些插件，等待即可，关于jenkins的配置，又可以写一篇文章了，这里简单记录下自己的构建shell&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ssh -tt root@123.207.241.*** &amp;gt; /home/ubuntu/tools/bai.log 2&amp;gt;&amp;amp;1 &amp;lt;&amp;lt; eeooff 
+cd /home/ubuntu/github/Hermes/
+git pull
+mvn clean
+mvn package -DskipTests
+sh /home/ubuntu/tools/apache-tomcat-8.5.4/bin/shutdown.sh
+cp /home/ubuntu/github/Hermes/target/cabeza-hermes.war /home/ubuntu/tools/apache-tomcat-8.5.4/webapps/hermes.war
+sh /home/ubuntu/tools/apache-tomcat-8.5.4/bin/startup.sh
+exit
+eeooff
+more /home/ubuntu/tools/bai.log
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;我是将jenkins单独放在一台服务器上，发布的项目在另一台服务器上，需要先建立远程互信，有时间写写。&lt;/p&gt;
+
+&lt;h5 id=&quot;section&quot;&gt;一些小工具&lt;/h5&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;screen&lt;/p&gt;
+
+    &lt;p&gt;参阅&lt;a href=&quot;http://www.cnblogs.com/mchina/archive/2013/01/30/2880680.html&quot;&gt;linux screen 命令详解&lt;/a&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;lszrz&lt;/p&gt;
+
+    &lt;p&gt;用来上传下载文件的，用ftp也可以&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;axel、aria2&lt;/p&gt;
+
+    &lt;p&gt;下载文件时，ubuntu自带的wget总觉得太慢，可以试试这两个下载工具&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;粗略的做了下记录，以后有空再补充&lt;/strong&gt;&lt;/p&gt;
+</description>
+        <pubDate>Mon, 12 Sep 2016 00:00:00 +0000</pubDate>
+        <link>cabeza.cn/blog/2016/09/12/linux-server-environment-establish/</link>
+        <guid isPermaLink="true">cabeza.cn/blog/2016/09/12/linux-server-environment-establish/</guid>
+        
+        <category>linux</category>
+        
+        
+        <category>blog</category>
+        
+      </item>
     
       <item>
         <title>自己搭建服务器造梯子的小记</title>
