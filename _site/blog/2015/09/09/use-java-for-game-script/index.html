@@ -224,9 +224,9 @@ JNIEXPORT void JNICALL Java_TowerUtil_keyPress
 </code></pre>
 
 <p>关于代码里出现的SendMessage函数:<a href="http://jingyan.baidu.com/article/c45ad29cd5fb58051653e278.html">SendMessage 函数参数大全</a> 的
-注意在开头引入jni.h和前面生成的TowerUtil.h
-### 生成dll文件
-下面生成前面提到的 towerutil.dll，windows可以下载MinGW进行编译:</p>
+注意在开头引入jni.h和前面生成的TowerUtil.h</p>
+<h3 id="dll">生成dll文件</h3>
+<p>下面生成前面提到的 towerutil.dll，windows可以下载MinGW进行编译:</p>
 
 <blockquote>
   <p>gcc -shared TowerUtil.cpp -o towerutil.dll -I （.h头文件目录）</p>

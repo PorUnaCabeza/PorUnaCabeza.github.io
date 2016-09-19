@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title>Weibo Crawler</title>
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/underscore-min.js"></script>
+    <style type="text/css">
+        .media-left label {
+            width: 85px;
+        }
+
+        #log-container {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .log-wrap {
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 12px !important;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            overflow: auto;
+            max-height: 400px;
+        }
+
+        #log-container p {
+            margin: 0;
+            padding: 0;
+        }
+
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Namárië</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+
+                <li>
+                    <a href="/about/">关于我</a>
+                </li>
+
+                <li>
+                    <a href="/archive/">列表</a>
+                </li>
+
+                <li>
+                    <a href="/tags/">标签</a>
+                </li>
+
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<header class="intro-header" style="background-color:#333">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="site-heading" style="padding:30px;">
+                    <h3>测试版</h3>
+                    <hr class="small">
+                    <span class="subheading">big brother is watching you</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container-fluid">
+
+    <div class="col-xs-8 col-xs-offset-2">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Panel title</h3>
+            </div>
+            <div class="panel-body">
+                <div class="input-group">
+                    <span class="input-group-addon">@</span>
+                    <input type="text" class="form-control" placeholder="Username">
+                </div>
+
+                <div class="input-group">
+                    <input type="text" class="form-control">
+                    <span class="input-group-addon">.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid" id="log-container">
+    <div class="col-xs-8 col-xs-offset-2">
+        <div class="log-wrap">
+            <div id="log-content"></div>
+        </div>
+        <div id="log-result">
+
+        </div>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="col-xs-8 col-xs-offset-2">
+        <div class="alert alert-success" role="alert">
+            ...
+        </div>
+
+        <!-- 多说评论框 start -->
+        <div class="comment">
+            <div class="ds-thread" data-thread-key="weibo" data-title="微博评论爬取"
+                 data-url="cabeza.cn/weibo.html"></div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript">
+    var duoshuoQuery = {short_name: "cabeza"};
+    (function () {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';
+        ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+        || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+</script>
+<script>
+    (function ($) {
+        var send = function (url, data, beforeSend, complete, success, error, type, contentType) {
+            return $.ajax({
+                type: type || "POST",
+                contentType: contentType || 'application/x-www-form-urlencoded;charset=UTF-8',
+                url: url,
+                data: data,
+                error: error,
+                beforeSend: beforeSend,
+                complete: complete,
+                success: success
+            });
+        };
+
+
+        var sendBase = function (url, data, success, error, type, showModal, contentType) {
+            var reqId = new Date().getTime();
+            var timeoutId;
+            return send(url, data, function () {
+                showModal && (timeoutId = setTimeout(function () {
+                    $.loadOn(null, reqId);
+                }, 0));
+            }, function () {
+                showModal && timeoutId && clearTimeout(timeoutId);
+            }, function (data) {
+                success && success(data);
+                showModal && $.loadOff(reqId);
+            }, function () {
+                error && error();
+                showModal && $.loadOff(reqId);
+            }, type, contentType);
+        };
+
+        $._send = function (url, success, error, type) {
+            return sendBase(url, null, success, error, type);
+        };
+
+        $.sendj = function (url, data, success, error, type) {
+            return sendBase(url, JSON.stringify(data), success, error, type, false, 'application/json;charset=UTF-8');
+        };
+    })(jQuery);
+    var $logContainer = $('#log-container');
+    var $logWrap = $('.log-wrap');
+    var $logContent = $('#log-content');
+    var dealComment = function (commentList) {
+        _.each(commentList, function (c) {
+            try {
+                var comment = JSON.parse(c);
+                $logContent.append('<p>' + comment.text + '</p>');
+            } catch (e) {
+                $logContent.append('<p>' + c + '</p>');
+            }
+        });
+    }
+
+    var logAjax = function (begin) {
+        $._send('http://127.0.0.1:2333/yeats-resource/v1/log/' + begin, function (data) {
+            if (data.status == 0) {
+                console.log('empty');
+                return;
+            }
+            if (data.list.length) {
+                dealComment(data.list);
+                $logWrap.scrollTop($logContent.height());
+                setTimeout(function () {
+                    logAjax(data.start + data.list.length);
+                }, 2000);
+            } else {
+                setTimeout(function () {
+                    logAjax(data.start);
+                }, 2000);
+            }
+        })
+    };
+
+
+    (function () {
+        $._send('http://127.0.0.1:2333/yeats-resource/v1/log/0', function (data) {
+            if (data.status == 0) {
+                console.log('empty');
+                return;
+            } else {
+                $logContainer.show();
+                if (data.list.length) {
+                    dealComment(data.list);
+                    logAjax(data.start + data.list.length);
+                } else {
+                    logAjax(data.start);
+                }
+            }
+        });
+    })();
+</script>
+</html>
