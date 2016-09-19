@@ -5,9 +5,9 @@
     <description></description>
     <link>cabeza.cn/</link>
     <atom:link href="cabeza.cn/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Mon, 19 Sep 2016 09:56:42 +0000</pubDate>
-    <lastBuildDate>Mon, 19 Sep 2016 09:56:42 +0000</lastBuildDate>
-    <generator>Jekyll v3.2.1</generator>
+    <pubDate>Mon, 19 Sep 2016 13:35:33 +0000</pubDate>
+    <lastBuildDate>Mon, 19 Sep 2016 13:35:33 +0000</lastBuildDate>
+    <generator>Jekyll v3.0.1</generator>
     
       <item>
         <title>linux环境搭建的一些记录</title>
@@ -533,38 +533,38 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
 &lt;p&gt;创建表格：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$('#vehicleTable').dataTable({
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$(&#39;#vehicleTable&#39;).dataTable({
     data:vehicleData,
     columnDefs: [
         {
             targets: 0,
-            data:'id',
-            title:'id'
+            data:&#39;id&#39;,
+            title:&#39;id&#39;
         },
         {
             targets:1,
-            data:'plateNumber',
-            title:'车牌'
+            data:&#39;plateNumber&#39;,
+            title:&#39;车牌&#39;
         },
         {
             targets:3,
-            data:'ownerName',
-            title:'车主'
+            data:&#39;ownerName&#39;,
+            title:&#39;车主&#39;
         },
         {
             targets:4,
-            data:'ownerTel',
-            title:'电话'
+            data:&#39;ownerTel&#39;,
+            title:&#39;电话&#39;
         },
         {
             targets:5,
-            data:'ownerIdNumber',
-            title:'车主身份证'
+            data:&#39;ownerIdNumber&#39;,
+            title:&#39;车主身份证&#39;
         },
         {
             targets:6,
-            data:'ownerAddress',
-            title:'地址'
+            data:&#39;ownerAddress&#39;,
+            title:&#39;地址&#39;
         }
     ]
 });
@@ -580,8 +580,8 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;targets:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;0,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;data:'id',&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;title:'id',&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;data:&#39;id&#39;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;title:&#39;id&#39;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;visible:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
@@ -591,8 +591,8 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;targets:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;0,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;data:'id',&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;title:'id',&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;data:&#39;id&#39;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;title:&#39;id&#39;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;visible:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;false,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;searchable:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;false，&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 	&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;orderable:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
@@ -644,8 +644,8 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 			data:null,
 			searchable:false,
 			orderable:false，
-			defaultContent:'&amp;lt;button type=&quot;button&quot; class=&quot;btn btn-danger btn-sm vehicle-del&quot;&amp;gt;删除&amp;lt;/button&amp;gt;' +
-			'&amp;lt;button type=&quot;button&quot; class=&quot;btn btn-primary btn-sm vehicle-update&quot;&amp;gt;更改&amp;lt;/button&amp;gt;'
+			defaultContent:&#39;&amp;lt;button type=&quot;button&quot; class=&quot;btn btn-danger btn-sm vehicle-del&quot;&amp;gt;删除&amp;lt;/button&amp;gt;&#39; +
+			&#39;&amp;lt;button type=&quot;button&quot; class=&quot;btn btn-primary btn-sm vehicle-update&quot;&amp;gt;更改&amp;lt;/button&amp;gt;&#39;
 		}
 	]
 &lt;/code&gt;&lt;/pre&gt;
@@ -708,7 +708,7 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 	//前面的省略
 	rowCallback:function( row, data, index ){
 		var id=data.id;
-		$('td',row).last().find('button').attr('vehicleId',id).attr(&quot;index&quot;,index);
+		$(&#39;td&#39;,row).last().find(&#39;button&#39;).attr(&#39;vehicleId&#39;,id).attr(&quot;index&quot;,index);
 	}
 ]
 &lt;/code&gt;&lt;/pre&gt;
@@ -719,10 +719,10 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 &lt;p&gt;当每次表格重绘的时候触发drawCallback，比如更新数据后或者创建新的元素&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;drawCallback:function(){
-        $('.vehicle-del').click(function(){
+        $(&#39;.vehicle-del&#39;).click(function(){
            dosomethig
         });
-        $('.vehicle-update').click(function(){
+        $(&#39;.vehicle-update&#39;).click(function(){
            dosomethig 
         });
     }
@@ -741,8 +741,8 @@ datatables可以使用三种基本的javascript数据类型来作为数据源：
 
 &lt;p&gt;例子：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$('#vehicleTable tbody').on('click','button',function(){
-	var tr=$(this).parents('tr');
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$(&#39;#vehicleTable tbody&#39;).on(&#39;click&#39;,&#39;button&#39;,function(){
+	var tr=$(this).parents(&#39;tr&#39;);
 	var rowData=table.api().row(tr).data();
 	//此处rowData即该行数据
 	dosomethig
@@ -1458,7 +1458,7 @@ public void traverse(Node root) {
     
       <item>
         <title>博客搬迁</title>
-        <description>&lt;p&gt;##博客搬迁&lt;/p&gt;
+        <description>&lt;h2 id=&quot;section&quot;&gt;博客搬迁&lt;/h2&gt;
 
 &lt;p&gt;近期将以往博客搬迁过来&lt;/p&gt;
 </description>
@@ -1585,9 +1585,9 @@ JNIEXPORT void JNICALL Java_TowerUtil_keyPress
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;关于代码里出现的SendMessage函数:&lt;a href=&quot;http://jingyan.baidu.com/article/c45ad29cd5fb58051653e278.html&quot;&gt;SendMessage 函数参数大全&lt;/a&gt; 的
-注意在开头引入jni.h和前面生成的TowerUtil.h&lt;/p&gt;
-&lt;h3 id=&quot;dll&quot;&gt;生成dll文件&lt;/h3&gt;
-&lt;p&gt;下面生成前面提到的 towerutil.dll，windows可以下载MinGW进行编译:&lt;/p&gt;
+注意在开头引入jni.h和前面生成的TowerUtil.h
+### 生成dll文件
+下面生成前面提到的 towerutil.dll，windows可以下载MinGW进行编译:&lt;/p&gt;
 
 &lt;blockquote&gt;
   &lt;p&gt;gcc -shared TowerUtil.cpp -o towerutil.dll -I （.h头文件目录）&lt;/p&gt;
