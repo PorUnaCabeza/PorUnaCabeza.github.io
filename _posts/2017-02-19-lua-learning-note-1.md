@@ -1,6 +1,6 @@
 ---
 layout: post
-title: lua学习笔记:根据user-agent展示不同网页
+title: lua学习笔记（一）:根据user-agent展示不同网页
 date: 2017-02-19
 categories: blog
 header-color: "#678"
