@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Music Idiot</title>
+  <link rel="shortcut icon" href="/img/favicon.ico">
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/clean-blog.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<style type="text/css">
+  .sub-row {
+    display: block;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+
+  .sub-row:after, .sub-row:before {
+    content: " ";
+    display: table;
+    clear: both
+  }
+
+  .key-panel {
+    max-width: 608px;
+    margin: 0 auto;
+  }
+
+  .key-list {
+    width: 100%;
+  }
+
+  .key-item {
+    width: 20%;
+    float: left;
+  }
+
+  .key-item:nth-child(1) .key-name {
+    background-color: #6d4f91;
+  }
+
+  .key-item:nth-child(2) .key-name {
+    background-color: #8aaead;
+  }
+
+  .key-item:nth-child(3) .key-name {
+    background-color: #afb29a;
+  }
+
+  .key-item:nth-child(4) .key-name {
+    background-color: #b88485;
+  }
+
+  .key-item:nth-child(5) .key-name {
+    background-color: #babbbe;
+  }
+
+  .key-name {
+    margin: 0 auto;
+    text-align: center;
+    height: 80px;
+    line-height: 80px;
+    max-width: 80px;
+    opacity: 0.8;
+    color: #fff;
+    font-weight: bold;
+    font-size: 20px;
+  }
+
+  .listen-test {
+    margin: 0 auto;
+    height: 120px;
+    width: 100%;
+    max-width: 608px;
+    background-color: #fff;
+    margin-bottom: 20px;
+  }
+
+  .test-btn {
+    margin: 0 auto;
+    display: block;
+    width: 140px;
+    margin-top: 20px;
+  }
+  .test-tip {
+    margin-bottom: 0;
+  }
+</style>
+
+<body>
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header page-scroll">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Namárië</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a href="/">Home</a>
+        </li>
+
+        <li>
+          <a href="/about/">关于我</a>
+        </li>
+
+        <li>
+          <a href="/archive/">列表</a>
+        </li>
+
+        <li>
+          <a href="/tags/">标签</a>
+        </li>
+
+      </ul>
+    </div>
+    <!-- /.navbar-collapse -->
+  </div>
+  <!-- /.container -->
+</nav>
+<!-- Page Header -->
+<header class="intro-header" style="background-color:#333">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <div class="site-heading" style="padding:30px;">
+          <h3>Music Idiot</h3>
+          <hr class="small">
+          <span class="subheading">琴魔开荒来3.0+有耐心高考300分+有智能手机的</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<!-- Main Content -->
+<div class="container-fluid">
+  <div class="row show-grid">
+    <div id="app" class="key-list sub-row">
+      <div v-show="test.testMode" class="listen-test">
+        <div class="test-tip alert alert-info">
+          {{testTip}}
+        </div>
+        <div class="test-result "
+             :class="[test.correctIndex == test.userAnswerIndex ? 'alert-success' : 'alert-danger']"
+             v-if="test.step==3">
+          <div>你的选择:{{userSelectName}}</div>
+          <div>正确答案:{{answerName}}</div>
+        </div>
+      </div>
+      <div class="sub-row key-panel">
+        <div v-for="(key,index) in keyList" @click="chooseKey(index)" class="key-item sub-row">
+          <div class="key-name">
+            {{key.chineseName}}
+          </div>
+        </div>
+      </div>
+      <div @click="changeTest" class="test-btn btn btn-primary">{{test.testMode?'停止训练':'开始训练'}}</div>
+      <audio v-if="playAudio" :src="selectedKey.src" autoplay></audio>
+    </div>
+  </div>
+  <br>
+
+  <div class="alert alert-warning" role="alert">
+    师傅说: 萌新打本, 看到世界上发老手速刷的就点进去, 团灭了先发一个问号?, 然后就喷队里的丐帮
+  </div>
+</div>
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      selectedIndex: null,
+      playAudio: false,
+      test: {
+        testMode: false,
+        step: null, // 0文案1听2答3结果
+        correctIndex: null,
+        userAnswerIndex: null
+      },
+      keyList: [
+        {
+          index: 1,
+          keyboardName: 'Q',
+          keyboardCode: 81,
+          chineseName: '宫',
+          src: 'seven-piano/1.mp3'
+        },
+        {
+          index: 2,
+          keyboardName: 'W',
+          keyboardCode: 87,
+          chineseName: '商',
+          src: 'seven-piano/2.mp3'
+        },
+        {
+          index: 3,
+          keyboardName: 'E',
+          keyboardCode: 69,
+          chineseName: '角',
+          src: 'seven-piano/3.mp3'
+        },
+        {
+          index: 6,
+          keyboardName: 'T',
+          keyboardCode: 84,
+          chineseName: '徵',
+          src: 'seven-piano/6.mp3'
+        },
+        {
+          index: 7,
+          keyboardName: 'U',
+          keyboardCode: 85,
+          chineseName: '羽',
+          src: 'seven-piano/7.mp3'
+        }
+      ]
+    },
+    methods: {
+      changeTest: function () {
+        this.test.testMode = !this.test.testMode;
+        this.test.step = 0;
+      },
+      chooseKey: function (index, userSelect = true) {
+        console.log(index);
+        this.playAudio = false;
+        this.$nextTick(function () {
+          this.selectedIndex = index;
+          this.playAudio = true;
+          if (this.test.step == 2 && userSelect) {
+            this.test.userAnswerIndex = index;
+          }
+          else if (this.test.step == 1 && !userSelect) {
+            this.test.correctIndex = index;
+          }
+        });
+      },
+      randomKey: function () {
+        return parseInt(Math.random() * 5);
+      }
+    },
+    computed: {
+      selectedKey: function () {
+        return this.keyList[this.selectedIndex];
+      },
+      userSelectName: function () {
+        if (this.keyList[this.test.userAnswerIndex])
+          return this.keyList[this.test.userAnswerIndex].chineseName;
+        return '未选择';
+      },
+      answerName: function () {
+        return this.keyList[this.test.correctIndex].chineseName;
+      },
+      testTip: function () {
+        if (this.test.step == 0 || this.test.step == 1)
+          return '请听音';
+        else if (this.test.step == 2)
+          return '请回答';
+        return '结果';
+      }
+    },
+    mounted: function () {
+      document.onkeydown = function (e) {
+        console.log(e.keyCode);
+        var keyCode = e.keyCode || e.which || e.charCode;
+        if (keyCode === 81) {  // q
+
+        }
+      }.bind(this);
+    },
+    watch: {
+      'test.step': function (val) {
+        if (!this.test.testMode)
+          return;
+        if (val == 0) {
+          setTimeout(() => {
+            this.test.step = 1;
+          }, 1000);
+        }
+        else if (val == 1) {
+          let index = this.randomKey();
+          this.chooseKey(index, false);
+          setTimeout(function () {
+            this.test.step = 2;
+          }.bind(this), 300);
+        } else if (val == 2) {
+          setTimeout(function () {
+            this.test.step = 3;
+          }.bind(this), 2500);
+        } else if (val == 3) {
+          setTimeout(function () {
+            this.test.step = 0;
+          }.bind(this), 1500);
+        }
+      }
+    }
+  })
+</script>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center">
+
+        </ul>
+        <p class="copyright text-muted">
+          &copy; 2018 cabeza ❖ Powered by Jekyll.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="/js/jquery.min.js "></script>
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+</body>
+</html>

@@ -125,3 +125,7 @@ function _M.redirect() {
 [lua-resty-redis的主页](https://github.com/openresty/lua-resty-redis)
 
 
+#### lua-resty-lrucache
+
+[lua-resty-lrucache](https://github.com/openresty/lua-resty-lrucache)
+
