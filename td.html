@@ -89,6 +89,7 @@
     width: 140px;
     margin-top: 20px;
   }
+
   .test-tip {
     margin-bottom: 0;
   }
@@ -153,7 +154,7 @@
     <div id="app" class="key-list sub-row">
       <div v-show="test.testMode" class="listen-test">
         <div class="test-tip alert alert-info">
-          {{testTip}}
+          {{testTip}} <span v-if="test.step==2">:{{userSelectName}}</span>
         </div>
         <div class="test-result "
              :class="[test.correctIndex == test.userAnswerIndex ? 'alert-success' : 'alert-danger']"
@@ -235,15 +236,15 @@
         this.test.step = 0;
       },
       chooseKey: function (index, userSelect = true) {
-        console.log(index);
+        if (this.test.step == 2 && userSelect) {
+          this.test.userAnswerIndex = index;
+          return;
+        }
         this.playAudio = false;
         this.$nextTick(function () {
           this.selectedIndex = index;
           this.playAudio = true;
-          if (this.test.step == 2 && userSelect) {
-            this.test.userAnswerIndex = index;
-          }
-          else if (this.test.step == 1 && !userSelect) {
+          if (this.test.step == 1 && !userSelect) {
             this.test.correctIndex = index;
           }
         });
@@ -288,6 +289,7 @@
         if (val == 0) {
           setTimeout(() => {
             this.test.step = 1;
+            this.test.userAnswerIndex = null;
           }, 1000);
         }
         else if (val == 1) {
@@ -299,7 +301,7 @@
         } else if (val == 2) {
           setTimeout(function () {
             this.test.step = 3;
-          }.bind(this), 2500);
+          }.bind(this), 3200);
         } else if (val == 3) {
           setTimeout(function () {
             this.test.step = 0;
