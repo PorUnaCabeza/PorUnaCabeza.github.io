@@ -5,9 +5,7 @@ description: "短发萧骚襟袖冷"
 header-color: "#222"
 ---
 
-- 懂一点音乐，会吹点口琴
-- 书读的略多，偏向文史
-- 半马runner，PB 1小时47分钟，目前在训练全马
+- 半马runner，PB 1小时47分
 - java程序员，技术栈java+nginx+redis+lua+服务器基础
 - 前端爱好者，技术栈es6+node+vue全家桶+backbone+丰富的移动端经验 
 - 邮箱：makpia@163.com
