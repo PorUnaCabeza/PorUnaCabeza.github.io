@@ -4,7 +4,8 @@ description: "server-resume"
 header-color: "#222"
 ---
 
-### 教育背景
+
+教育背景
 
 江苏科技大学 计算机科学与技术 (2012.09 ~ 2016.06)
 

@@ -17,7 +17,7 @@ p {
 </style>
 <div class="row">
     <div class="col-xs-2 resume-label">姓名：</div>
-    <div class="col-xs-10">张黑子</div>
+    <div class="col-xs-10">张祥顺</div>
     <div class="col-xs-2 resume-label">性别：</div>
     <div class="col-xs-10">男</div>
     <div class="col-xs-2 resume-label">生日：</div>
