@@ -26,11 +26,15 @@ p {
     <div class="col-xs-10">18006246719 13952266094</div>
     <div class="col-xs-2 resume-label">邮箱：</div>
     <div class="col-xs-10">
-        <a href="mailto:makpia@163.com">makpia@163.com</a>
+        makpia@163.com
+    </div>
+    <div class="col-xs-2 resume-label">博客：</div>
+    <div class="col-xs-10">
+         http://www.cabeza.cn
     </div>
     <div class="col-xs-2 resume-label">github：</div>
     <div class="col-xs-10">
-         <a href="https://github.com/PorUnaCabeza" target="_blank">https://github.com/PorUnaCabeza</a>
+         https://github.com/PorUnaCabeza
     </div>
 </div>
 
