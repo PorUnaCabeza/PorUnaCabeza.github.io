@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Music Idiot</title>
+  <link rel="shortcut icon" href="/img/favicon.ico">
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/clean-blog.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<style type="text/css">
+  body {
+    background: #565f77 none repeat scroll 0 0;
+    color: #000;
+    font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    margin: 0;
+    padding: 0;
+    /* position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;*/
+    /*bug:当内容超过一屏时，滚动条需要默认显示*/
+    overflow-y: scroll;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+  }
+
+  h3 {
+    font-size: 20px;
+    margin: 0;
+    margin-top: 25px;
+  }
+
+  @-webkit-keyframes loading-7 {
+    0% {
+      margin-bottom: 0
+    }
+    50% {
+      margin-bottom: 20px;
+    }
+    100% {
+      margin-bottom: 0px;
+    }
+  }
+  .stack-wrapper{
+    margin: 0 auto;
+    position: relative;
+    z-index: 1000;
+    width: 320px;
+    height: 420px;
+    padding: 0;
+    list-style: none;
+    pointer-events: none;
+  }
+  .controls{
+    position: relative;
+    width: 200px;
+    text-align: center;
+    display:flex;/*Flex布局*/
+    display: -webkit-flex; /* Safari */
+    justify-content:space-around;
+    margin: 0 auto;
+    margin-top: 50px
+  }
+  .controls .button {
+    border: none;
+    background: none;
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    font-size: 16px;
+    width: 50px;
+    height: 50px;
+    z-index: 100;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    border-radius: 50%;
+    background: #fff;
+  }
+  .button .next{
+    display: inline-block;
+    width: 10px;
+    height:5px;
+    background: rgb(129,212,125);
+    line-height: 0;
+    font-size:0;
+    vertical-align: middle;
+    -webkit-transform: rotate(45deg);
+    left: -5px;
+    top: 2px;
+    position: relative;
+  }
+  .button .next:after{
+    content:'/';
+    display:block;
+    width: 20px;
+    height:5px;
+    background: rgb(129,212,125);
+    -webkit-transform: rotate(-90deg) translateY(-50%) translateX(50%);
+  }
+  .button .prev{
+    display: inline-block;
+    width: 20px;
+    height:5px;
+    background: rgb(230,104,104);
+    line-height: 0;
+    font-size:0;
+    vertical-align: middle;
+    -webkit-transform: rotate(45deg);
+  }
+  .button .prev:after{
+    content:'/';
+    display:block;
+    width: 20px;
+    height:5px;
+    background: rgb(230,104,104);
+    -webkit-transform: rotate(-90deg);
+  }
+  .controls .text-hidden {
+    position: absolute;
+    overflow: hidden;
+    width: 0;
+    height: 0;
+    color: transparent;
+    display: block;
+  }
+
+  .loadingDot i {
+    display: inline-block;
+    margin-left: 5px;
+    background: rgb(27, 188, 155);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .loadingDot i:nth-child(1) {
+    -webkit-animation: loading-7 .7s ease-in 0s infinite;
+  }
+
+  .loadingDot i:nth-child(2) {
+    -webkit-animation: loading-7 .7s ease-in 0.15s infinite;
+  }
+
+  .loadingDot i:nth-child(3) {
+    -webkit-animation: loading-7 .7s ease-in 0.3s infinite;
+  }
+
+  .loadingDot i:nth-child(4) {
+    -webkit-animation: loading-7 .7s ease-in 0.45s infinite;
+  }
+
+  *,
+  *:after,
+  *::before {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    outline: none;
+  }
+
+  .main {
+    display: flex; /*Flex布局*/
+    display: -webkit-flex; /* Safari */
+    align-items: center; /*指定垂直居中*/
+    justify-content: center; /*指定水平居中*/
+    height: 100%;
+  }
+
+  button::-moz-focus-inner, input[type="reset"]::-moz-focus-inner, input[type="button"]::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="file"] > input[type="button"]::-moz-focus-inner {
+    border: none;
+  }
+
+  :focus {
+    outline: 0;
+  }
+
+  .stack {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    perspective: 1000px;
+    perspective-origin: 50% 150%;
+    -webkit-perspective: 1000px;
+    -webkit-perspective-origin: 50% 150%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .stack-item {
+    ackground: #fff;
+    height: 100%;
+    width: 100%;
+    border-radius: 4px;
+    text-align: center;
+    overflow: hidden;
+    position: absolute;
+    opacity: 0;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: auto;
+  }
+
+  .stack-item img {
+    width: 100%;
+    display: block;
+    pointer-events: none;
+  }
+  .db-item {
+    width: 100%;
+    color:#555;
+    background-color: aliceblue;
+    border-radius: 5px;
+  }
+  .stack-container li.move-back {
+    /* http://matthewlein.com/ceaser/ */
+    -webkit-transition-timing-function: cubic-bezier(0.175, 0.885, 0.470, 1); /* older webkit */
+    -webkit-transition-timing-function: cubic-bezier(0.175, 0.885, 0.470, 1.515);
+    transition-timing-function: cubic-bezier(0.175, 0.885, 0.470, 1.515);
+  }
+  .stack .stack-item:nth-child(7n+1) .db-item {
+    background-color: #c5cae5;
+  }
+  .stack .stack-item:nth-child(7n+2) .db-item {
+    background-color: #b7e3ea;
+  }
+  .stack .stack-item:nth-child(7n+3) .db-item {
+    background-color: #dcebc9;
+  }
+  .stack .stack-item:nth-child(7n+4) .db-item {
+    background-color: #b6e4f9;
+  }
+  .stack .stack-item:nth-child(7n+5) .db-item {
+    background-color: #facbbe;
+  }
+  .stack .stack-item:nth-child(7n+1) .db-item {
+    background-color: #b3dfdb;
+  }
+  .stack .stack-item:nth-child(7n+1) .db-item {
+    background-color: #b2dcb3;
+  }
+  .db-item img {
+    width: 90px;
+    height: 90px;
+    border-radius: 90px;
+    margin: 10px auto;
+    border: 2px solid #fff;
+  }
+  .db-item .desc {
+    margin-bottom: 5px;
+  }
+  .navbar-custom{
+    background: none;
+    border: none;
+  }
+</style>
+
+<body>
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header page-scroll" style="background-color:#565f77">
+      <a class="navbar-brand" href="/" style="color:#fff">Namárië</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a href="/">Home</a>
+        </li>
+
+        <li>
+          <a href="/about/">关于我</a>
+        </li>
+
+        <li>
+          <a href="/archive/">列表</a>
+        </li>
+
+        <li>
+          <a href="/tags/">标签</a>
+        </li>
+
+      </ul>
+    </div>
+    <!-- /.navbar-collapse -->
+  </div>
+  <!-- /.container -->
+</nav>
+<!-- Page Header -->
+<!-- Main Content -->
+<div class="container-fluid" style="margin-top:100px;">
+  <div class="row show-grid">
+    <div class="main" ontouchstart="iosScrollBug()">
+      <div id="stack">
+        <div class="stack-wrapper">
+          <ul class="stack" ref="stack">
+            <li class="stack-item" v-for="(item, index) in pages"
+                :style="[transformIndex(index),transform(index)]"
+                @touchmove.stop.capture.prevent="touchmove"
+                @touchstart.stop.capture.prevent="touchstart"
+                @touchend.stop.capture.prevent="touchend"
+                @touchcancel.stop.capture.prevent="touchend"
+                @mousedown.stop.capture.prevent="touchstart"
+                @mouseup.stop.capture.prevent="touchend"
+                @mousemove.stop.capture.prevent="touchmove"
+                @mouseout.stop.capture.prevent="touchend"
+                @webkit-transition-end="onTransitionEnd(index)"
+                @transitionend="onTransitionEnd(index)">
+              <div class="db-item">
+                <img :src="item.sex == 1 ? 'img/db/male.jpeg' : 'img/db/female.jpeg'">
+               <div>
+                <div class='desc'>{{item.sex == 1 ? '男': '女'}}&nbsp;{{item.birthday}}</div>
+                <div class='desc'>身高：{{item.height}}</div>
+                <div class='desc'>学历：{{item.education}}</div>
+                <div class='desc'>工作：{{item.work}}</div>
+                <div class='desc'>住址:{{item.address}}</div>
+                <div class='desc'>父母情况：{{item.parent}}</div>
+                <div class='desc'>兄妹情况：{{item.brother}}</div>
+                <div class='desc'>房产情况：{{item.house}}</div>
+                <div class='desc'>自我描述：{{item.desc}}</div>
+                <div class='desc'>择偶要求: {{item.target}}</div>
+                <div class='desc'>联系：{{item.link}}</div>
+               </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="controls">
+          <button @click="prev" class="button"><i class="prev"></i><span class="text-hidden">prev</span></button>
+          <button @click="next" class="button"><i class="next"></i><span class="text-hidden">next</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  // ios 如果父层不进行touch事件的绑定，会造成子层不触发touch事件，猜想可能是事件的传递问题
+  function iosScrollBug() {
+  }
+</script>
+<script>
+  let transform
+  let transition
+  let transitionEnd
+  let hasTranslate3d
+  (function () {
+    let el = document.createElement('_')
+    let style = el.style
+    let prop
+    if (style[prop = 'webkitTransition'] === '') {
+      transitionEnd = 'webkitTransitionEnd'
+      transition = prop
+    }
+    if (style[prop = 'transition'] === '') {
+      transitionEnd = 'transitionend'
+      transition = prop
+    }
+    if (style[prop = 'webkitTransform'] === '') {
+      transform = prop
+    }
+    if (style[prop = 'msTransform'] === '') {
+      transform = prop
+    }
+    if (style[prop = 'transform'] === '') {
+      transform = prop
+    }
+    document.body.insertBefore(el, null)
+    style[transform] = 'translate3d(0, 0, 0)'
+    hasTranslate3d = !!window.getComputedStyle(el).getPropertyValue(transform)
+    document.body.removeChild(el)
+  }())
+
+  var app = new Vue({
+    el: '#stack',
+    data () {
+      return {
+        pages: [],
+        pages1: [],
+        stackinit: {
+          visible: 3
+        },
+        basicdata: {
+          start: {},
+          end: {}
+        },
+        temporaryData: {
+          prefixes: {
+            transform,
+            transition,
+            transitionEnd,
+            hasTranslate3d
+          },
+          offsetY: '',
+          poswidth: 0,
+          posheight: 0,
+          lastPosWidth: '',
+          lastPosHeight: '',
+          lastZindex: '',
+          rotate: 0,
+          lastRotate: 0,
+          visible: 3,
+          tracking: false,
+          animation: false,
+          currentPage: 0,
+          opacity: 1,
+          lastOpacity: 0,
+          swipe: false,
+          zIndex: 10
+        }
+      }
+    },
+    computed: {
+      // 划出面积比例
+      offsetRatio () {
+        let width = this.$el.offsetWidth
+        let height = this.$el.offsetHeight
+        let offsetWidth = width - Math.abs(this.temporaryData.poswidth)
+        let offsetHeight = height - Math.abs(this.temporaryData.posheight)
+        let ratio = 1 - (offsetWidth * offsetHeight) / (width * height) || 0
+        return ratio > 1 ? 1 : ratio
+      },
+      // 划出宽度比例
+      offsetWidthRatio () {
+        let width = this.$el.offsetWidth
+        let offsetWidth = width - Math.abs(this.temporaryData.poswidth)
+        let ratio = 1 - offsetWidth / width || 0
+        return ratio
+      }
+    },
+    mounted () {
+      let that = this;
+      setTimeout(function () {
+        that.pages = [
+          {
+            sex: '0',
+            birthday: '1993年',
+            height: '160',
+            education: '大专',
+            work: '待定',
+            address: '徐州市九里区',
+            parent: '未知',
+            brother: '有个弟弟',
+            house: '和父母一起住',
+            desc: '内向，爱游戏',
+            target: '个子要高，男的',
+            link: '@和谐丶'
+          },
+          {
+            sex: '1',
+            birthday: '1992年',
+            height: '170',
+            education: '大专',
+            work: '个体',
+            address: '徐州市阿卡',
+            parent: '未知',
+            brother: '独生子',
+            house: '和父母一起住',
+            desc: '活泼活泼，爱玩游戏',
+            target: '要长的漂亮...',
+            link: '@和谐丶'
+          },
+          {
+            sex: '1',
+            birthday: '1991年',
+            height: '178',
+            education: '好得很',
+            work: '事业单位',
+            address: '徐州市滨湖',
+            parent: '挺好的',
+            brother: '独生子',
+            house: '自己住',
+            desc: '活泼活泼，爱玩游戏',
+            target: '感觉对了怎能都好',
+            link: '@厚'
+          },
+          {
+            sex: '1',
+            birthday: '1992年',
+            height: '185',
+            education: '大专',
+            work: '个体',
+            address: '徐州',
+            parent: '挺好的',
+            brother: '独生子',
+            house: '自己住',
+            desc: '活泼活泼，喜欢旅游',
+            target: '感觉对了怎能都好',
+            link: '@法海也有爱🙈🙉🙊จุ๊บ '
+          },
+          {
+            sex: '1',
+            birthday: '1994年',
+            height: '180',
+            education: '本科',
+            work: '无业游民',
+            address: '徐州市九里万科',
+            parent: '挺好的',
+            brother: '独生子',
+            house: '和父母一起住',
+            desc: '活泼活泼，爱玩游戏',
+            target: '感觉对了怎能都好',
+            link: '@薰薰薰薰薰薰薰❃ﾟ♚ '
+          },
+          {
+            sex: '0',
+            birthday: '1996年',
+            height: '168',
+            education: '大专',
+            work: '幼师',
+            address: '徐州市',
+            parent: '未知',
+            brother: '独生女',
+            house: '在和父母一起住',
+            desc: '活泼活泼，爱玩剑三',
+            target: '未知',
+            link: '@和谐丶'
+          }
+        ]
+      }, 1000)
+    },
+    methods: {
+      prev () {
+        this.$refs.stack.$emit('prev')
+      },
+      next () {
+        this.$refs.stack.$emit('next')
+      },
+      touchstart (e) {
+        if (this.temporaryData.tracking) {
+          return
+        }
+        // 是否为touch
+        if (e.type === 'touchstart') {
+          if (e.touches.length > 1) {
+            this.temporaryData.tracking = false
+            return
+          } else {
+            // 记录起始位置
+            this.basicdata.start.t = new Date().getTime()
+            this.basicdata.start.x = e.targetTouches[0].clientX
+            this.basicdata.start.y = e.targetTouches[0].clientY
+            this.basicdata.end.x = e.targetTouches[0].clientX
+            this.basicdata.end.y = e.targetTouches[0].clientY
+            // offsetY在touch事件中没有，只能自己计算
+            this.temporaryData.offsetY = e.targetTouches[0].pageY - this.$el.offsetParent.offsetTop
+          }
+          // pc操作
+        } else {
+          this.basicdata.start.t = new Date().getTime()
+          this.basicdata.start.x = e.clientX
+          this.basicdata.start.y = e.clientY
+          this.basicdata.end.x = e.clientX
+          this.basicdata.end.y = e.clientY
+          this.temporaryData.offsetY = e.offsetY
+        }
+        this.temporaryData.tracking = true
+        this.temporaryData.animation = false
+      },
+      touchmove (e) {
+        // 记录滑动位置
+        if (this.temporaryData.tracking && !this.temporaryData.animation) {
+          if (e.type === 'touchmove') {
+            e.preventDefault()
+            this.basicdata.end.x = e.targetTouches[0].clientX
+            this.basicdata.end.y = e.targetTouches[0].clientY
+          } else {
+            e.preventDefault()
+            this.basicdata.end.x = e.clientX
+            this.basicdata.end.y = e.clientY
+          }
+          // 计算滑动值
+          this.temporaryData.poswidth = this.basicdata.end.x - this.basicdata.start.x
+          this.temporaryData.posheight = this.basicdata.end.y - this.basicdata.start.y
+          let rotateDirection = this.rotateDirection()
+          let angleRatio = this.angleRatio()
+          this.temporaryData.rotate = rotateDirection * this.offsetWidthRatio * 15 * angleRatio
+        }
+      },
+      touchend (e) {
+        this.temporaryData.tracking = false
+        this.temporaryData.animation = true
+        // 滑动结束，触发判断
+        // 判断划出面积是否大于0.4
+        if (this.offsetRatio >= 0.4) {
+          // 计算划出后最终位置
+          let ratio = Math.abs(this.temporaryData.posheight / this.temporaryData.poswidth)
+          this.temporaryData.poswidth = this.temporaryData.poswidth >= 0 ? this.temporaryData.poswidth + 200 : this.temporaryData.poswidth - 200
+          this.temporaryData.posheight = this.temporaryData.posheight >= 0 ? Math.abs(this.temporaryData.poswidth * ratio) : -Math.abs(this.temporaryData.poswidth * ratio)
+          this.temporaryData.opacity = 0
+          this.temporaryData.swipe = true
+          this.nextTick()
+          // 不满足条件则滑入
+        } else {
+          this.temporaryData.poswidth = 0
+          this.temporaryData.posheight = 0
+          this.temporaryData.swipe = false
+          this.temporaryData.rotate = 0
+        }
+      },
+      nextTick () {
+        // 记录最终滑动距离
+        this.temporaryData.lastPosWidth = this.temporaryData.poswidth
+        this.temporaryData.lastPosHeight = this.temporaryData.posheight
+        this.temporaryData.lastRotate = this.temporaryData.rotate
+        this.temporaryData.lastZindex = 20
+        // 循环currentPage
+        this.temporaryData.currentPage = this.temporaryData.currentPage === this.pages.length - 1 ? 0 : this.temporaryData.currentPage + 1
+        // currentPage切换，整体dom进行变化，把第一层滑动置最低
+        this.$nextTick(() => {
+          this.temporaryData.poswidth = 0
+          this.temporaryData.posheight = 0
+          this.temporaryData.opacity = 1
+          this.temporaryData.rotate = 0
+        })
+      },
+      onTransitionEnd (index) {
+        let lastPage = this.temporaryData.currentPage === 0 ? this.pages.length - 1 : this.temporaryData.currentPage - 1
+        // dom发生变化正在执行的动画滑动序列已经变为上一层
+        if (this.temporaryData.swipe && index === lastPage) {
+          this.temporaryData.animation = true
+          this.temporaryData.lastPosWidth = 0
+          this.temporaryData.lastPosHeight = 0
+          this.temporaryData.lastOpacity = 0
+          this.temporaryData.lastRotate = 0
+          this.temporaryData.swipe = false
+          this.temporaryData.lastZindex = -1
+        }
+      },
+      prev () {
+        this.temporaryData.tracking = false
+        this.temporaryData.animation = true
+        // 计算划出后最终位置
+        let width = this.$el.offsetWidth
+        this.temporaryData.poswidth = -width
+        this.temporaryData.posheight = 0
+        this.temporaryData.opacity = 0
+        this.temporaryData.rotate = '-3'
+        this.temporaryData.swipe = true
+        this.nextTick()
+      },
+      next () {
+        this.temporaryData.tracking = false
+        this.temporaryData.animation = true
+        // 计算划出后最终位置
+        let width = this.$el.offsetWidth
+        this.temporaryData.poswidth = width
+        this.temporaryData.posheight = 0
+        this.temporaryData.opacity = 0
+        this.temporaryData.rotate = '3'
+        this.temporaryData.swipe = true
+        this.nextTick()
+      },
+      rotateDirection () {
+        if (this.temporaryData.poswidth <= 0) {
+          return -1
+        } else {
+          return 1
+        }
+      },
+      angleRatio () {
+        let height = this.$el.offsetHeight
+        let offsetY = this.temporaryData.offsetY
+        let ratio = -1 * (2 * offsetY / height - 1)
+        return ratio || 0
+      },
+      inStack (index, currentPage) {
+        let stack = []
+        let visible = this.temporaryData.visible
+        let length = this.pages.length
+        for (let i = 0; i < visible; i++) {
+          if (currentPage + i < length) {
+            stack.push(currentPage + i)
+          } else {
+            stack.push(currentPage + i - length)
+          }
+        }
+        return stack.indexOf(index) >= 0
+      },
+      // 非首页样式切换
+      transform (index) {
+        let currentPage = this.temporaryData.currentPage
+        let length = this.pages.length
+        let lastPage = currentPage === 0 ? this.pages.length - 1 : currentPage - 1
+        let style = {}
+        let visible = this.temporaryData.visible
+        if (index === this.temporaryData.currentPage) {
+          return
+        }
+        if (this.inStack(index, currentPage)) {
+          let perIndex = index - currentPage > 0 ? index - currentPage : index - currentPage + length
+          style['opacity'] = '1'
+          style['transform'] = 'translate3D(0,0,' + -1 * 60 * (perIndex - this.offsetRatio) + 'px' + ')'
+          style['zIndex'] = visible - perIndex
+          if (!this.temporaryData.tracking) {
+            style[this.temporaryData.prefixes.transition + 'TimingFunction'] = 'ease'
+            style[this.temporaryData.prefixes.transition + 'Duration'] = 300 + 'ms'
+          }
+        } else if (index === lastPage) {
+          style['transform'] = 'translate3D(' + this.temporaryData.lastPosWidth + 'px' + ',' + this.temporaryData.lastPosHeight + 'px' + ',0px) ' + 'rotate(' + this.temporaryData.lastRotate + 'deg)'
+          style['opacity'] = this.temporaryData.lastOpacity
+          style['zIndex'] = this.temporaryData.lastZindex
+          style[this.temporaryData.prefixes.transition + 'TimingFunction'] = 'ease'
+          style[this.temporaryData.prefixes.transition + 'Duration'] = 300 + 'ms'
+        } else {
+          style['zIndex'] = '-1'
+          style['transform'] = 'translate3D(0,0,' + -1 * visible * 60 + 'px' + ')'
+        }
+        return style
+      },
+      // 首页样式切换
+      transformIndex (index) {
+        if (index === this.temporaryData.currentPage) {
+          let style = {}
+          style['transform'] = 'translate3D(' + this.temporaryData.poswidth + 'px' + ',' + this.temporaryData.posheight + 'px' + ',0px) ' + 'rotate(' + this.temporaryData.rotate + 'deg)'
+          style['opacity'] = this.temporaryData.opacity
+          style['zIndex'] = 10
+          if (this.temporaryData.animation) {
+            style[this.temporaryData.prefixes.transition + 'TimingFunction'] = 'ease'
+            style[this.temporaryData.prefixes.transition + 'Duration'] = (this.temporaryData.animation ? 300 : 0) + 'ms'
+          }
+          return style
+        }
+      }
+
+    }
+  })
+</script>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center">
+
+        </ul>
+        <p class="copyright text-muted">
+          &copy; 2018 cabeza ❖ Powered by Jekyll.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- Bootstrap Core JavaScript -->
+</body>
+</html>
