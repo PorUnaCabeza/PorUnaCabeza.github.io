@@ -223,6 +223,7 @@
     pointer-events: none;
   }
   .db-item {
+    height: 100%;
     width: 100%;
     color:#555;
     background-color: aliceblue;
@@ -328,13 +329,13 @@
                 <img :src="item.sex == 1 ? 'img/db/male.jpeg' : 'img/db/female.jpeg'">
                <div>
                 <div class='desc'>{{item.sex == 1 ? '男': '女'}}&nbsp;{{item.birthday}}</div>
-                <div class='desc'>身高：{{item.height}}</div>
+                <div v-if="!!item.height" class='desc'>身高：{{item.height}}</div>
                 <div class='desc'>学历：{{item.education}}</div>
                 <div class='desc'>工作：{{item.work}}</div>
-                <div class='desc'>住址:{{item.address}}</div>
-                <div class='desc'>父母情况：{{item.parent}}</div>
-                <div class='desc'>兄妹情况：{{item.brother}}</div>
-                <div class='desc'>房产情况：{{item.house}}</div>
+                <div v-if="!!item.address" class='desc'>住址:{{item.address}}</div>
+                <div v-if="!!item.parent" class='desc'>父母情况：{{item.parent}}</div>
+                <div v-if="!!item.brother" class='desc'>兄妹情况：{{item.brother}}</div>
+                <div v-if="!!item.house" class='desc'>房产情况：{{item.house}}</div>
                 <div class='desc'>自我描述：{{item.desc}}</div>
                 <div class='desc'>择偶要求: {{item.target}}</div>
                 <div class='desc'>联系：{{item.link}}</div>
@@ -449,6 +450,20 @@
       let that = this;
       setTimeout(function () {
         that.pages = [
+          {
+            sex: '1',
+            birthday: '1993年',
+            height: '',
+            education: '矿大研究生二年级',
+            work: '在读',
+            address: '',
+            parent: '',
+            brother: '',
+            house: '',
+            desc: '喜欢旅游和健身',
+            target: '希望女生，也是在校学生吧，年龄差距一到三岁可以接受。性格活泼一点的',
+            link: '@扁食不是饺子'
+          },
           {
             sex: '0',
             birthday: '1993年',
