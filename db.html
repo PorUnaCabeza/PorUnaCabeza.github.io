@@ -228,6 +228,7 @@
     color:#555;
     background-color: aliceblue;
     border-radius: 5px;
+    border: 2px solid #fff;
   }
   .stack-container li.move-back {
     /* http://matthewlein.com/ceaser/ */
@@ -326,7 +327,8 @@
                 @webkit-transition-end="onTransitionEnd(index)"
                 @transitionend="onTransitionEnd(index)">
               <div class="db-item">
-                <img :src="item.sex == 1 ? 'img/db/male.jpeg' : 'img/db/female.jpeg'">
+                <img v-if="!!item.img" :src="item.img">
+                <img v-else :src="item.sex == 1 ? 'img/db/male.jpeg' : 'img/db/female.jpeg'">
                <div>
                 <div class='desc'>{{item.sex == 1 ? '男': '女'}}&nbsp;{{item.birthday}}</div>
                 <div v-if="!!item.height" class='desc'>身高：{{item.height}}</div>
@@ -449,6 +451,21 @@
       let that = this;
       setTimeout(function () {
         that.pages = [
+          {
+            img: 'img/db/luobo.png',
+            sex: '0',
+            birthday: '1989年',
+            height: '155',
+            education: '大专',
+            work: '护士',
+            address: '',
+            parent: '',
+            brother: '',
+            house: '',
+            desc: '游戏，小说，电视，旅游',
+            target: '甜甜的男孩纸',
+            link: '@萝卜🥕'
+          },
           {
             sex: '0',
             birthday: '1991年',
