@@ -333,7 +333,7 @@
                 <div class='desc'>{{item.sex == 1 ? '男': '女'}}&nbsp;{{item.birthday}}</div>
                 <div v-if="!!item.height" class='desc'>身高：{{item.height}}</div>
                 <div class='desc'>学历：{{item.education}}</div>
-                <div class='desc'>工作：{{item.work}}</div>
+                <div v-if="!!item.work" class='desc'>工作：{{item.work}}</div>
                 <div v-if="!!item.address" class='desc'>住址:{{item.address}}</div>
                 <div v-if="!!item.parent" class='desc'>父母情况：{{item.parent}}</div>
                 <div v-if="!!item.brother" class='desc'>兄妹情况：{{item.brother}}</div>
@@ -451,6 +451,20 @@
       let that = this;
       setTimeout(function () {
         that.pages = [
+         {
+            sex: '1',
+            birthday: '1991年',
+            height: '183',
+            education: '本科',
+            work: '',
+            address: '西三环火花',
+            parent: '',
+            brother: '有个姐姐',
+            house: '有套小房子',
+            desc: '有幽默感，有责任心，不乱来',
+            target: '身高168以上，家境相仿（我怕好的我配不上），温柔贤淑型',
+            link: '@十三 / Mio的一天'
+          },
           {
             img: 'img/db/luobo.png',
             sex: '0',
