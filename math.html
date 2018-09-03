@@ -119,25 +119,32 @@
       methods: {
         iterationCult () {
           let array = this.iterationCullingText.replace(/\r\n/g, '--').replace(/\n/g, '--').split('--');
-          if (!array || array.length < 1)
+          if (!array || array.length < 2)
             return;
           array = array.map(a => parseFloat(a));
-          let result = this.iterationCulling(array);
-          this.iterationCullingResult = result.join('\n');
+          this.iterationCullingResult = this.iterationCulling(array);
         },
-        sum(x, y) {
-          return x + y;
+        sum(array) {
+          let sum = 0;
+          for(let i = 0; i< array.length; i++)
+            sum+= array[i];
+          return sum;
         },
         avg(array) {      // 均值
-          return array.reduce(this.sum) / array.length;
+          let sum = this.sum(array);
+          return sum / array.length;
         },
         square(x) {
           return x * x;
         },
         stddev(array) {   // 标准差
           let avg = this.avg(array);
-          let deviations = array.map(x => x - avg);
-          return Math.sqrt(deviations.map(this.square).reduce(this.sum) / (array.length - 1));
+          let r = 0;
+          for(let i =0; i< array.length; i++) {
+            let dev = array[i] - avg;
+            r+= (dev * dev);
+          }
+          return Math.sqrt(r / (array.length - 1));
         },
         iteration (array, avg, stddev) {
           return array.every(item => item > avg - 2 * stddev && item < avg + 2 * stddev);
@@ -151,8 +158,10 @@
           let flag = this.iteration(array, avg, stddev)
           console.log(array);
           console.log(`平均值：${this.avg(array)},标准差: ${this.stddev(array)}, ${flag}`);
-          if (flag)
-            return array;
+          if (flag) {
+            console.log(`结果数组: ${array}`);
+            return `迭代去除背景值：${avg + 2 * stddev},平均值：${this.avg(array)},标准差: ${this.stddev(array)}`;
+          }
           array = this.filterArray(array, avg, stddev);
           console.log(`过滤结果: ${array}`);
           return this.iterationCulling(array);
