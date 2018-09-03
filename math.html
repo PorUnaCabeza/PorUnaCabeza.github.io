@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Math Tools</title>
+  <link rel="shortcut icon" href="/img/favicon.ico">
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/clean-blog.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<style type="text/css">
+  .sub-row {
+    display: block;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+
+  .sub-row:after,
+  .sub-row:before {
+    content: " ";
+    display: table;
+    clear: both
+  }
+  textarea {
+    box-sizing: border-box;
+    width: 100%;
+    resize: none;
+    border-radius: 4px;
+    border: 1px solid #ededed;
+    height: 290px;
+    padding: 10px;
+    outline: 0;
+  }
+</style>
+
+<body>
+  <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header page-scroll">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">Namárië</a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a href="/">Home</a>
+          </li>
+
+          <li>
+            <a href="/about/">关于我</a>
+          </li>
+
+          <li>
+            <a href="/archive/">列表</a>
+          </li>
+
+          <li>
+            <a href="/tags/">标签</a>
+          </li>
+
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+  </nav>
+  <!-- Page Header -->
+  <header class="intro-header" style="background-color:#333">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+          <div class="site-heading" style="padding:30px;">
+            <h3>Math Tools</h3>
+            <hr class="small">
+            <span class="subheading">for eclipse</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- Main Content -->
+  <div class="container-fluid">
+    <div class="row show-grid">
+      <div id="app" class="key-list sub-row">
+        <textarea class="iteration-culling-input" placeholder="请输入" v-model="iterationCullingText"></textarea>
+        <button @click="iterationCult" class="btn btn-primary">迭代剔除</button>
+        <div>结果：</div>
+        <textarea class="iteration-culling-output" v-model="iterationCullingResult"></textarea>
+      </div>
+    </div>
+    <br>
+
+    <div class="alert alert-warning" role="alert">
+      
+    </div>
+  </div>
+  <script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+        iterationCullingText: "",
+        iterationCullingResult: ''
+      },
+      methods: {
+        iterationCult () {
+          let array = this.iterationCullingText.replace(/\r\n/g, '--').replace(/\n/g, '--').split('--');
+          if (!array || array.length < 1)
+            return;
+          array = array.map(a => parseFloat(a));
+          let result = this.iterationCulling(array);
+          this.iterationCullingResult = result.join('\n');
+        },
+        sum(x, y) {
+          return x + y;
+        },
+        avg(array) {      // 均值
+          return array.reduce(this.sum) / array.length;
+        },
+        square(x) {
+          return x * x;
+        },
+        stddev(array) {   // 标准差
+          let avg = this.avg(array);
+          let deviations = array.map(x => x - avg);
+          return Math.sqrt(deviations.map(this.square).reduce(this.sum) / (array.length - 1));
+        },
+        iteration (array, avg, stddev) {
+          return array.every(item => item > avg - 2 * stddev && item < avg + 2 * stddev);
+        },
+        filterArray (array, avg, stddev) {
+          return array.filter(item => item > avg - 2 * stddev && item < avg + 2 * stddev);
+        },
+        iterationCulling (array) {
+          let avg = this.avg(array);
+          let stddev = this.stddev(array);
+          let flag = this.iteration(array, avg, stddev)
+          console.log(array);
+          console.log(`平均值：${this.avg(array)},标准差: ${this.stddev(array)}, ${flag}`);
+          if (flag)
+            return array;
+          array = this.filterArray(array, avg, stddev);
+          console.log(`过滤结果: ${array}`);
+          return this.iterationCulling(array);
+        }
+      },
+      computed: {
+
+      },
+      mounted: function () {
+
+      },
+      watch: {
+
+      }
+    })
+  </script>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+          <ul class="list-inline text-center">
+
+          </ul>
+          <p class="copyright text-muted">
+            &copy; 2018 cabeza ❖ Powered by Jekyll.
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="/js/jquery.min.js "></script>
+  <!-- Bootstrap Core JavaScript -->
+  <script src="/js/bootstrap.min.js "></script>
+</body>
+
+</html>
