@@ -50,16 +50,15 @@ p {
 ---
 ### 专业技能
 ---
-- 熟悉html5 css3 javascript(es6)
+- 熟悉html5 css3 javascript
 - 熟悉vue，熟悉vuex数据状态管理，了解vue的服务端渲染
 - 了解react，backbone
-- 了解node，webpack(能使用node + webpack构建前端应用）
-- 具有使用electron开发跨平台桌面应用的经验
-- 熟悉前端的打包部署流程，有jenkins的部署、使用经验
-- 对移动端开发、浏览器兼容性有一些经验。
+- 了解node，webpack
+- 有开发electron跨平台桌面应用的经验
+- 熟悉前端的打包部署流程，有jenkins部署经验
 - 熟悉linux环境，熟悉nginx的使用
 - 熟悉后端语言java，了解lua、python
-- 熟悉关系型数据库mysql，非关系型数据库redis
+- 熟悉关系型数据库mysql，非关系型数据库redis。了解mongodb、oracle
 
 ---
 ### 工作经验
