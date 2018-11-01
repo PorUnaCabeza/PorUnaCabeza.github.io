@@ -82,7 +82,7 @@ p {
 **项目描述：**结合微信公众平台的开放能力，以微信公众号为载体，实现用户选节目、看大片、买商品、享服务等功能
 
 **项目职责：**
-1. 负责移动端工程的搭建（vue + webpack）、维护与部署，负责移动端屏幕自适应布局
+1. 负责移动端工程的搭建（vue + webpack）、部署，负责移动端屏幕自适应布局
 2. 优化前端工程（减小体积，拆分代码）
 3. 负责移动端首页的开发、缓存策略的制定等
 4. 独立开发基于vue的富文本编辑器的前期版本
@@ -105,17 +105,17 @@ p {
 **地址：**
     [https://github.com/PorUnaCabeza/Yeats](https://github.com/PorUnaCabeza/Yeats)
 <p>&nbsp;</p>
-#### 2、Icarus (正在开发)
+#### 2、Sun-Reaver (多人协作，正在开发)
 
-**简介：** 基于node的数字货币价格爬虫，用于量化交易代码的回测
+**简介：** 一款基于react、graphql的编年史展示网站
 
 **做了什么：**
-- 学习了node中mysql、http等模块，学习使用express这个web应用开发框架
-- 定时收集交易所价格信息，批量导入mysql
-- 使用express实现查询接口，返回距离给出时间戳最近的时间的价格信息
+- 学习graphql这个新的api标准，完成了基于java的后端工程的搭建
+- 学习node中mysql、http模块，完成基于node的爬虫应用
+- 负责了该项目域名与服务器的申请、部署，负责ci持续集成搭建
 
 **地址：**
-[https://github.com/PorUnaCabeza/Icarus](https://github.com/PorUnaCabeza/Icarus)
+[https://github.com/Sun-Reaver](https://github.com/Sun-Reaver)
 
 ---
 ### 关于我
