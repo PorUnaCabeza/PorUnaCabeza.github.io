@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="screen-orientation" content="portrait">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0"/>
+    <title>年会抽奖小程序</title>
+    <link rel="stylesheet" type="text/css" href="css/reset.css">
+    <link rel="stylesheet" type="text/css" href="css/wall.css">
+    <link type="text/css" rel="stylesheet" href=css/index.css>
+</head>
+<body>
+<div id="app">
+    <div id="tools" class="tools">
+        <button
+            @click="onClick(item.id)"
+            class="pure-button"
+            :class="{'button-error': selectedBtnId == item.id}"
+            v-for="item in btns">{{item.name}}-{{item.value}}</button>
+        <button
+            class="pure-button"
+            @click="toggle"
+            :class="[{'button-secondary': !running},{'button-success': running}]">{{running?'停!':'开始'}}</button>
+        <button class="pure-button button-warning" @click="reset">重置</button>
+        <button class="pure-button button-warning" @click="showModal=true">配置</button>
+    </div>
+    <div class="modal" v-if="showModal">
+        <div class="hehe">
+            <label for="">一等奖数量:</label>
+            <input type="number" v-model.number="btns[0].value">
+        </div>
+        <div class="hehe">
+            <label for="">二等奖数量:</label>
+            <input type="number" v-model.number="btns[1].value">
+        </div>
+        <div class="hehe">
+            <label for="">三等奖数量:</label>
+            <input type="number" v-model.number="btns[2].value">
+        </div>
+        <div>奖池(一行一个名字):</div>
+        <textarea  id="fuck" v-model="jc" cols="30" rows="10"></textarea>
+        <button class="pure-button button-warning" @click="confirm">确定</button>
+    </div>
+</div>
+<div id="main" class="wall"></div>
+<div id="result" class="result"></div>
+<script type="text/javascript" src="js/zepto.js"></script>
+<!-- <script type="text/javascript" src="js/vue.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.js"></script>
+<script type="text/javascript" src="js/tagcanvas.js"></script>
+<script type="text/javascript" src="js/member.js"></script>
+<script type="text/javascript">
+    (function(){
+        var choosed = JSON.parse(localStorage.getItem('choosed')) || {};
+        console.log(choosed);
+        var speed = function(){
+            return [0.1 * Math.random() + 0.01, -(0.1 * Math.random() + 0.01)];
+        };
+        var getName = function(item){
+            return item.name;
+        };
+        var createHTML = function() {
+            var html = [ '<ul>' ];
+            member.forEach(function(item, index){
+                item.index = index;
+                var key = getName(item);
+                var color = choosed[key] ? 'yellow' : 'white';
+                html.push('<li><a href="#" style="color: ' + color + ';">' + item.name + '</a></li>');
+            });
+            html.push('</ul>');
+            return html.join('');
+        };
+        var lottery = function(count){
+            var total = member.length - 1;
+            var ret = [];
+            var list = canvas.getElementsByTagName('a');
+            var color = 'yellow';
+            if (member.length - Object.keys(choosed).length <= count) {
+                ret = member.filter(v => choosed[v.name] != 1)
+                            .map(v => v.name);
+                ret.forEach(v => {
+                    let index = member.findIndex(i => i.name == v);
+                    list[index].style.color = color;
+                    choosed[v] = 1;
+                });
+            localStorage.setItem('choosed', JSON.stringify(choosed));
+            return ret;
+            }
+            for(var i = 0; i < count; i++) {
+                do {
+                    var id = Math.ceil(Math.random() * total);
+                    if (member[id]){
+                        var name = getName(member[id]);
+                    }
+                } while(choosed[name]);
+                choosed[name] = 1;
+                ret.push(member[id].name);
+                list[id].style.color = color;
+            }
+            localStorage.setItem('choosed', JSON.stringify(choosed));
+            return ret;
+        };
+        var canvas = document.createElement('canvas');
+        canvas.id = 'myCanvas';
+        canvas.width = document.body.offsetWidth;
+        canvas.height = document.body.offsetHeight;
+        document.getElementById('main').appendChild(canvas);
+        new Vue({
+            el: '#app',
+            data: {
+                showModal: false,
+                selectedBtnId: 3,
+                running: false,
+                jc: localStorage.getItem('jc') || '呵呵',
+                jcArray: [],
+                btns: [
+                    {
+                        id: '1',
+                        name: '一等奖',
+                        value: 3
+                    },
+                    {
+                        id: '2',
+                        name: '二等奖',
+                        value: 4
+                    },
+                    {
+                        id: '3',
+                        name: '三等奖',
+                        value: 1
+                    }
+                ]
+            },
+            mounted: function () {
+                this.buildHtml();
+            },
+            methods: {
+                buildHtml () {
+                    this.jcArray = this.jc.replace(/\r\n/g, '__').replace(/\n/g, '__').split('__').filter(i => i.length > 0);
+                    member = this.jcArray.map(i => ({name: i}));
+                    canvas.innerHTML = createHTML();
+                    TagCanvas.Start('myCanvas', '', {
+                        textColour: null,
+                        initial: speed(),
+                        dragControl: 1,
+                        textHeight: 14
+                    });
+                },
+                confirm: function () {
+                    this.showModal = false;
+                    localStorage.setItem('jc', this.jc);
+                    this.buildHtml();
+                },
+                reset: function(){
+                    if(confirm('确定要重置么？所有之前的抽奖历史将被清除！')){
+                        localStorage.clear();
+                        location.reload(true);
+                    }
+                },
+                onClick: function(id){
+                    $('#result').css('display', 'none');
+                    $('#main').removeClass('mask');
+                    this.selectedBtnId = id;
+                },
+                toggle: function(){
+                    if(this.running){
+                        TagCanvas.SetSpeed('myCanvas', speed());
+                        var num = this.btns.find(item => item.id == this.selectedBtnId).value;
+                        var ret = lottery(num);
+                        $('#result').css('display', 'block').html('<span>' + ret.join('</span><span>') + '</span>');
+                        TagCanvas.Reload('myCanvas');
+                        setTimeout(function(){
+                            localStorage.setItem(new Date().toString(), JSON.stringify(ret));
+                            $('#main').addClass('mask');
+                        }, 300);
+                    } else {
+                        $('#result').css('display', 'none');
+                        $('#main').removeClass('mask');
+                        TagCanvas.SetSpeed('myCanvas', [5, 1]);
+                    }
+                    this.running = !this.running;
+                }
+            }
+        });
+    })();
+</script>
+</body>
+</html>
