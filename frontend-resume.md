@@ -1,14 +1,6 @@
 ---
-layout: page
-description: "frontend-resume"
-header-color: "#222"
----
-
-
 ### 个人信息
-
 ---
-
 <style type="text/css">
 .resume-label {
     text-align: right;
