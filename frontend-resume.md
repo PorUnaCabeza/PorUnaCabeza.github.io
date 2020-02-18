@@ -4,9 +4,11 @@ description: "frontend-resume"
 header-color: "#222"
 ---
 
----
+
 ### 个人信息
+
 ---
+
 <style type="text/css">
 .resume-label {
     text-align: right;
@@ -23,7 +25,7 @@ p {
     <div class="col-xs-2 resume-label">生日：</div>
     <div class="col-xs-10">1993.08</div>
     <div class="col-xs-2 resume-label">电话：</div>
-    <div class="col-xs-10">18006246719 13952266094</div>
+    <div class="col-xs-10">18006246719</div>
     <div class="col-xs-2 resume-label">邮箱：</div>
     <div class="col-xs-10">
         makpia@163.com
@@ -38,111 +40,107 @@ p {
     </div>
 </div>
 
-
-
 ---
+
 ### 教育背景
+
 ---
+
 江苏科技大学 计算机科学与技术 (2012.09 ~ 2016.06)
 
-专业课程：java程序设计、数据库原理、算法与数据结构、Linux操作系统、计算机组成原理
+专业课程：java 程序设计、数据库原理、算法与数据结构、Linux 操作系统、计算机组成原理
 
 ---
+
 ### 专业技能
----
-- 熟悉html5 css3 javascript
-- 熟悉react，有基于react-reconciler实现二次开发renderer的经验
-- 熟悉vue全家桶
-- 熟悉node，webpack。有webpack插件开发经验
-- 有开发electron跨平台桌面应用的经验
-- 熟悉前端的打包部署流程，熟悉基于jenkins的前端部署
-- 熟悉linux环境，熟悉nginx的使用
-- 熟悉后端语言java，有两年的java开发经验，了解lua、python
-- 熟悉关系型数据库mysql，非关系型数据库redis。了解mongodb、oracle
 
 ---
+
+- 熟悉 html5 css3 javascript
+- 熟悉 react，有基于 react-reconciler 实现二次开发 renderer 的经验
+- 熟悉 vue 全家桶
+- 熟悉 node，webpack。有 webpack 插件开发经验
+- 有开发 electron 跨平台桌面应用的经验
+- 熟悉前端的打包部署流程，熟悉基于 jenkins 的前端部署
+- 熟悉 linux 环境，了解 nginx 的使用
+- 熟悉后端语言 java，有两年的 java 开发经验，了解 lua、python
+- 熟悉关系型数据库 mysql，非关系型数据库 redis。了解 mongodb、oracle
+
+---
+
 ### 工作经验
+
 ---
 
-#### 1、南京希音电子商务有限公司 2019.02 - 至今
+#### 一、南京希音电子商务有限公司 2019.02 - 至今
 
-**项目名称：** React-ZPL
+##### 1、React-ZPL
 
 **项目描述：** React ZPL 是一个能让你的 React 代码转换成打印机语言(ZPL)的 JavaScript 库
 
+**项目背景：** 旧的仓储打印流程是通过 puppteteer 通过生成 pdf 来打印，会有多个网络请求，易受到网络波动影响。
+为了减少流程环节数，并且传输的数据量尽可能小，决定使用 ZPL 这一特定领域语言来进行传输
+
 **项目职责：**
-1. 负责绝大部分开发任务
-2. 负责制定逻辑组件、对外接口
-3. 负责React自定义的跨端渲染
-4. 负责基于yoga-layout的不依赖CSSOM的布局
-5. 负责抽象位置信息对ZPL的转换
+
+- 负责绝大部分开发任务
+- 负责 React 自定义的跨端渲染
+- 负责基于 yoga-layout 的布局处理
+- 负责抽象位置信息对 ZPL 的转换
 
 ---
 
-**项目名称：** Metric Space
+##### 2、Metric Space
 
 **项目描述：** 前端代码质量检测平台
 
+**项目背景：** 随着业务的快速迭代，前端代码越来越多（repo 数量达到三位数），此时对前端整体以及每个项目，需要有一个把控，
+需要知道可量化的数据。为技术架构选型，员工代码质量，项目构成等提要的数据参考。
+
 **项目职责：**
-1. 担任项目经理、技术经理，负责全部开发任务
-2. 负责表结构的制定
-3. 负责任务调度模块的设计
-4. 负责基于ast计算前端代码中组件的使用率，负责计算前端代码圈复杂度、重复度、可维护性指数
-5. 负责前台展示界面的开发
+
+- 担任项目经理、技术经理
+- 负责基于 AST 收集前端代码中自研组件和 antd 组件的使用情况的开发
+- 负责收集前端代码圈复杂度、可维护性指数、版本变革历史等数据的开发
+- 负责前台展示界面的开发
 
 ---
 
-#### 2、南京瑞奕惟扬信息科技有限公司 2016.06 - 2019.02
+##### 3、Webpack-External-Map
+
+**项目描述：** webpack-external-map 是一个根据您的 webpack external 配置，自动在 index.html 中添加 cdn 地址的插件
+
+**项目背景：** 前端项目太多，发展历史中存在多个版本的内部 CDN 地址，需要进行统一
+
+**项目职责：**
+
+- 负责爬取 NPM、UNPKG 信息
+- 利用 Metric Space，收集、整理所有工程的静态资源信息、external 信息
+- 负责对同一个类库多个版本之间的差分工作
+- 负责对每个工程的依赖关系进行拓扑排序
+- 负责 webpack 插件的编写
+
+---
+
+#### 二、南京瑞奕惟扬信息科技有限公司 2016.06 - 2019.02
 
 **项目名称：** AFUOS
 
 **项目描述：** 结合微信公众平台的开放能力，以微信公众号为载体，实现用户选节目、看大片、买商品、享服务等功能
 
 **项目职责：**
-1. 负责移动端工程的搭建（vue + webpack）、部署，负责移动端屏幕自适应布局
-2. 参与H5动效库的开发
-3. 负责移动端首页的开发、缓存策略的制定等
-4. 独立开发基于vue的富文本编辑器的前期版本
-5. 参与基于vue-server-renderer的前台静态化的工作；并实现基于nginx + lua的另一种静态化方案
-6. 参与前台用户行为记录、统计功能的开发（基于ngx_http_sub_module模块）
-7. 组织小组成员学习新技术（es6新特性、openresty等），组织代码review
 
+- 负责移动  端首页的开发、缓存策略的制定等
+-  参与 H5 动效库的开发
+- 独立开发基于 vue 的富文本编辑器的前期版本
+- 参与基于 vue-server-renderer 的前台静态化的工作；并实现基于 nginx + lua 的另一种静态化方案
+- 参与前台用户行为记录、统计功能的开发（基于 ngx_http_sub_module 模块）
 
 ---
-### 个人项目
----
-#### 1、Yeats
 
-**简介：**  java微博爬虫，用于爬取某微博账户在微博中留下的评论
-
-**做了什么：**
-- 自动获取最新高匿代理，并添加到代理池，每次请求使用不同的代理
-- 实现小号自动登录，并保存多个用户的cookie，用于反微博防爬虫系统
-- 利用中间件redis，控制并发数量、实现消息的后台生产与前台消费
-
-**地址：**
-    [https://github.com/PorUnaCabeza/Yeats](https://github.com/PorUnaCabeza/Yeats)
-<p>&nbsp;</p>
-#### 2、Sun-Reaver (多人协作，正在开发)
-
-**简介：** 一款基于react、graphql的编年史展示网站
-
-**做了什么：**
-- 学习graphql这个新的api标准，完成了基于java的后端工程的搭建
-- 学习node中mysql、http模块，完成基于node的爬虫应用
-- 负责了该项目域名与服务器的申请、部署，负责ci持续集成搭建
-
-**地址：**
-[https://github.com/Sun-Reaver](https://github.com/Sun-Reaver)
-
----
 ### 关于我
+
 ---
-- 学习能力强，喜欢捣鼓技术方面的东西
+
+- 学习能力强， 喜欢捣鼓技术方面的东西
 - 无尽的好奇心，热爱多样性的美好
-
-
-
-
-
-
