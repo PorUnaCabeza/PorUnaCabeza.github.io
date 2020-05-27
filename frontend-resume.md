@@ -11,16 +11,16 @@ p {
 </style>
 <div class="row">
     <div class="col-xs-2 resume-label">姓名：</div>
-    <div class="col-xs-10">张祥顺</div>
+    <div class="col-xs-10">张黑子</div>
     <div class="col-xs-2 resume-label">性别：</div>
     <div class="col-xs-10">男</div>
     <div class="col-xs-2 resume-label">生日：</div>
-    <div class="col-xs-10">1993.08</div>
+    <div class="col-xs-10">199x.08</div>
     <div class="col-xs-2 resume-label">电话：</div>
-    <div class="col-xs-10">18006246719</div>
+    <div class="col-xs-10">180xxxxxxxx</div>
     <div class="col-xs-2 resume-label">邮箱：</div>
     <div class="col-xs-10">
-        makpia@163.com
+        xxx@163.com
     </div>
     <div class="col-xs-2 resume-label">博客：</div>
     <div class="col-xs-10">
@@ -64,7 +64,7 @@ p {
 
 ---
 
-#### 一、南京希音电子商务有限公司 2019.02 - 至今
+#### 一、南京xxx商务有限公司 2019.02 - 至今
 
 ##### 1、React-ZPL
 
@@ -114,7 +114,7 @@ p {
 
 ---
 
-#### 二、南京瑞奕惟扬信息科技有限公司 2016.06 - 2019.02
+#### 二、南京xxx信息科技有限公司 2016.06 - 2019.02
 
 **项目名称：** AFUOS
 
